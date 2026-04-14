@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment files
+.env
+
+# Build output
+/frontend/dist/
+/frontend/build/
+
+# Laravel specific
+/backend/storage/*.key
+/backend/storage/framework/cache/data/*
+/backend/storage/framework/sessions/*
+/backend/storage/framework/views/*
+/backend/bootstrap/cache/*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
