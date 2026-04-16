@@ -81,12 +81,23 @@ const PCard = ({ p }) => {
 
 const Landing = () => {
   const router = useIonRouter();
+  const [user, setUser] = useState(null);
   const [heroImg, setHeroImg] = useState(0);
 
   useEffect(() => {
+    const u = JSON.parse(localStorage.getItem("user"));
+    if (u) setUser(u);
+    
     const t = setInterval(() => setHeroImg(i => (i + 1) % PRODUCTOS.length), 3500);
     return () => clearInterval(t);
   }, []);
+
+  const goToDashboard = () => {
+    if (!user) return;
+    if (user.empresa) router.push("/proveedor");
+    else router.push("/PantallaInicio");
+  };
+
 
   return (
     <IonPage>
@@ -109,10 +120,18 @@ const Landing = () => {
             </div>
             <div className="ld-nav-links">
               <button className="ld-nav-link" onClick={() => router.push("/productos")}>Catálogo</button>
-              <button className="ld-nav-link" onClick={() => router.push("/login")}>Iniciar sesión</button>
-              <button className="ld-nav-btn" onClick={() => router.push("/login")}>
-                Registrarse →
-              </button>
+              {user ? (
+                <button className="ld-nav-btn" onClick={goToDashboard}>
+                  Mi Tablero →
+                </button>
+              ) : (
+                <>
+                  <button className="ld-nav-link" onClick={() => router.push("/login")}>Iniciar sesión</button>
+                  <button className="ld-nav-btn" onClick={() => router.push("/login")}>
+                    Registrarse →
+                  </button>
+                </>
+              )}
             </div>
           </nav>
 

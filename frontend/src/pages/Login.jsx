@@ -32,13 +32,8 @@ const Login = () => {
   
   const [errors, setErrors] = useState({});
   
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
-      if (user.empresa) router.push("/proveedor", "forward", "replace");
-      else router.push("/PantallaInicio", "forward", "replace");
-    }
-  }, []);
+  // Se eliminó la redirección automática para permitir cambio de cuenta o ver el formulario
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
