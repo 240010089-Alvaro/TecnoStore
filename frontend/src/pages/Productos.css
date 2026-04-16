@@ -72,3 +72,81 @@
 .pg-empty-icon { width: 68px; height: 68px; border-radius: 50%; background: #fff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #a0aec0; }
 .pg-empty-text { font-size: 14px; color: #a0aec0; font-weight: 500; }
 .pg-empty-text strong { color: #718096; }
+
+/* Cart Button */
+.pg-cart-btn {
+  position: relative;
+  background: linear-gradient(135deg, #ebf4ff, #f0ebff);
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  color: #2b6cb0; font-size: 21px; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(43, 108, 176, 0.08);
+}
+.pg-cart-btn:hover {
+  background: linear-gradient(135deg, #dbeafe, #e8e0ff);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(43, 108, 176, 0.18);
+}
+.pg-cart-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+.pg-cart-badge {
+  position: absolute; top: -6px; right: -6px;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: white;
+  font-size: 10px; font-weight: 800;
+  min-width: 20px; height: 20px; border-radius: 20px;
+  padding: 0 5px;
+  display: flex; align-items: center; justify-content: center;
+  border: 2.5px solid white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  animation: pgBadgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes pgBadgePop {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+/* Center Modal Override para Login Req */
+ion-modal.logout-modal-premium.center-modal {
+  --width: 90%;
+  --max-width: 420px;
+  --height: auto;
+  --max-height: 90%;
+  --border-radius: 24px;
+  --box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  --background: transparent;
+  align-items: center;
+  justify-content: center;
+}
+.lm-container.login-req-container {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  background: rgba(12, 16, 28, 0.98);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 40px 32px 36px;
+  font-family: 'Outfit', sans-serif;
+  border-radius: 24px;
+}
+.lm-icon-wrapper { margin-bottom: 20px; }
+.lm-icon-bg {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; border: 1px solid transparent;
+}
+.pulse-anim { animation: lm-pulse-blue 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes lm-pulse-blue {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+}
+.lm-title { font-size: 24px; font-weight: 800; margin: 0 0 10px; }
+.lm-subtitle { font-size: 14px; line-height: 1.6; margin: 0 0 30px; max-width: 320px; }
+.lm-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
+.lm-btn { width: 100%; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; border: none; }
+.lm-btn-cancel { background: rgba(255, 255, 255, 0.05); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
+.lm-btn-cancel:active { background: rgba(255, 255, 255, 0.08); transform: scale(0.98); }
+.lm-btn-confirm { color: white; }
+.lm-btn-confirm:active { transform: scale(0.96); }

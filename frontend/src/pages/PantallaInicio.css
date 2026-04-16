@@ -154,3 +154,77 @@
 .pi-profile-field { margin-bottom: 14px; }
 .pi-profile-label { font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(100, 116, 139, .55); margin-bottom: 5px; }
 .pi-profile-value { font-size: 14px; color: #e2e8f0; font-weight: 500; padding: 10px 14px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .06); border-radius: 11px; word-break: break-all; margin: 0; }
+
+/* Logout Modal Premium */
+ion-modal.logout-modal-premium.center-modal {
+  --width: 90%;
+  --max-width: 420px;
+  --height: auto;
+  --max-height: 90%;
+  --border-radius: 24px;
+  --box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  --background: transparent;
+  align-items: center;
+  justify-content: center;
+}
+.lm-container {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  background: rgba(12, 16, 28, 0.98);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 40px 32px 36px;
+  font-family: 'DM Sans', sans-serif;
+}
+.lm-icon-wrapper { margin-bottom: 20px; }
+.lm-icon-bg {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(249, 115, 22, 0.1));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: flex; align-items: center; justify-content: center;
+  color: #ef4444; font-size: 32px;
+}
+.pulse-anim { animation: lm-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+@keyframes lm-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+}
+.lm-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #fff; margin: 0 0 10px; }
+.lm-subtitle { font-size: 14px; color: rgba(148, 163, 184, 0.8); line-height: 1.6; margin: 0 0 30px; max-width: 320px; }
+.lm-actions { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
+.lm-btn { width: 100%; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.lm-btn-confirm { background: linear-gradient(135deg, #dc2626, #ef4444); color: white; border: none; box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3); }
+.lm-btn-confirm:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2); }
+.lm-btn-cancel { background: rgba(255, 255, 255, 0.05); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
+.lm-btn-cancel:active { background: rgba(255, 255, 255, 0.08); transform: scale(0.98); }
+
+/* User Popover Premium */
+ion-popover.user-menu-popover {
+  --background: rgba(12, 16, 28, 0.85);
+  --backdrop-filter: blur(24px) saturate(180%);
+  --border-radius: 18px;
+  --box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255,255,255,0.06);
+  --offset-y: 8px;
+}
+.user-menu-popover::part(content) { border-radius: 18px; }
+.ump-container {
+  padding: 8px; width: 240px; font-family: 'DM Sans', sans-serif;
+}
+.ump-header { padding: 14px 12px; }
+.ump-name { display: block; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.ump-email { display: block; font-size: 12px; color: rgba(148, 163, 184, 0.7); overflow: hidden; text-overflow: ellipsis; }
+.ump-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 6px; }
+.ump-actions { display: flex; flex-direction: column; gap: 2px; }
+.ump-btn {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  background: transparent; border: none; padding: 12px; border-radius: 12px;
+  color: #cbd5e1; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.ump-btn:hover { background: rgba(255, 255, 255, 0.05); color: #fff; transform: translateX(2px); }
+.ump-btn-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center;
+  color: #94a3b8; font-size: 14px; transition: all 0.2s;
+}
+.ump-btn:hover .ump-btn-icon { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.ump-danger.ump-btn:hover { background: rgba(239, 68, 68, 0.08); color: #ef4444; }
+.ump-danger.ump-btn:hover .ump-btn-icon { background: rgba(239, 68, 68, 0.15); color: #ef4444; }

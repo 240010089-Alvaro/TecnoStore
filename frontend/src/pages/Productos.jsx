@@ -4,10 +4,14 @@ import {
   IonPage, 
   IonIcon,
   useIonRouter,
-  IonSpinner
+  IonSpinner,
+  IonModal,
+  IonButton
 } from '@ionic/react';
-import { arrowBackOutline, searchOutline, cubeOutline } from 'ionicons/icons';
+import { arrowBackOutline, searchOutline, cubeOutline, cartOutline, logInOutline } from 'ionicons/icons';
 import ProductoCard from "../components/ProductoCard";
+import CartModal from "../components/CartModal";
+import { useCart } from "../context/CartContext";
 import './Productos.css';
 
 const Productos = () => {
@@ -17,6 +21,18 @@ const Productos = () => {
   const [categoriaSeleccionada, setCategoria] = useState("Todos");
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
+  const [showCart, setShowCart] = useState(false);
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
+  const { cartItemCount } = useCart();
+
+  const requireAuth = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      setShowAuthAlert(true);
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
     fetch("http://localhost:8000/api/productos")
@@ -68,6 +84,16 @@ const Productos = () => {
                   onChange={e => setBusqueda(e.target.value)}
                 />
               </div>
+
+              <button 
+                className="pg-cart-btn" 
+                onClick={() => {
+                  if (requireAuth()) setShowCart(true);
+                }}
+              >
+                <IonIcon icon={cartOutline} />
+                {cartItemCount > 0 && <span className="pg-cart-badge">{cartItemCount}</span>}
+              </button>
             </div>
           </header>
 
@@ -95,7 +121,7 @@ const Productos = () => {
             ) : filtrados.length > 0 ? (
               <div className="pg-grid">
                 {filtrados.map((p, i) => (
-                  <ProductoCard key={p.id} producto={p} index={i} />
+                  <ProductoCard key={p.id} producto={p} index={i} onRequireAuth={requireAuth} />
                 ))}
               </div>
             ) : (
@@ -111,6 +137,39 @@ const Productos = () => {
           </main>
         </div>
       </IonContent>
+
+      {/* Modal Auth Requerido */}
+      <IonModal 
+        isOpen={showAuthAlert} 
+        onDidDismiss={() => setShowAuthAlert(false)} 
+        className="logout-modal-premium center-modal login-req-modal"
+        backdropDismiss={true}
+      >
+        <div className="lm-container login-req-container">
+          <div className="lm-icon-wrapper">
+            <div className="lm-icon-bg pulse-anim" style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(6, 182, 212, 0.1))', borderColor: 'rgba(59, 130, 246, 0.3)', color: '#3b82f6', boxShadow: '0 0 20px rgba(59, 130, 246, 0.4)' }}>
+              <IonIcon icon={logInOutline} className="lm-icon" />
+            </div>
+          </div>
+          
+          <h2 className="lm-title" style={{ color: '#f0f9ff' }}>Inicia Sesión</h2>
+          <p className="lm-subtitle" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
+            Para agregar productos a tu carrito y realizar la compra necesitas estar conectado a tu cuenta.
+          </p>
+          
+          <div className="lm-actions">
+            <button className="lm-btn lm-btn-cancel" onClick={() => setShowAuthAlert(false)}>
+              Seguir explorando
+            </button>
+            <button className="lm-btn lm-btn-confirm" style={{ background: 'linear-gradient(135deg, #1d4ed8, #3b82f6)', boxShadow: '0 8px 20px rgba(59, 130, 246, 0.3)' }} onClick={() => { setShowAuthAlert(false); setTimeout(() => router.push('/login'), 150); }}>
+              Ir a iniciar sesión
+              <IonIcon icon={logInOutline} style={{ marginLeft: '6px' }} />
+            </button>
+          </div>
+        </div>
+      </IonModal>
+
+      <CartModal isOpen={showCart} onDismiss={() => setShowCart(false)} onRequireAuth={requireAuth} />
     </IonPage>
   );
 };

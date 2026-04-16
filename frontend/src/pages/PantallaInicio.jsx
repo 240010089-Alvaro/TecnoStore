@@ -7,7 +7,8 @@ import {
   IonAlert,
   IonModal,
   IonButton,
-  IonIcon
+  IonIcon,
+  IonPopover
 } from '@ionic/react';
 import { 
   flashOutline, 
@@ -46,12 +47,16 @@ const PantallaInicio = () => {
   const [user, setUser] = useState(null);
   
   // Ionic Overlays states
-  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [popoverState, setPopoverState] = useState({ show: false, event: undefined });
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem("user"));
+    if (!u) {
+      router.push("/login", "back", "replace");
+      return;
+    }
     setUser(u);
   }, []);
 
@@ -59,7 +64,7 @@ const PantallaInicio = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    router.push("/", "back", "replace");
+    window.location.replace("/"); // Recargo duro para asegurar destrucción de estado de sesión
   };
 
   return (
@@ -96,7 +101,7 @@ const PantallaInicio = () => {
                 <span className="pi-cart-badge">0</span>
               </div>
 
-              <div className="pi-avatar-btn" onClick={() => setShowActionSheet(true)}>
+              <div className="pi-avatar-btn" onClick={(e) => setPopoverState({ show: true, event: e.nativeEvent })}>
                 <div className="pi-avatar">{inicial}</div>
                 <span className="pi-avatar-name">{user?.name?.split(" ")[0] ?? "Usuario"}</span>
                 <IonIcon icon={chevronDownOutline} style={{ color: 'rgba(148,163,184,.5)', fontSize: '14px' }} />
@@ -219,52 +224,86 @@ const PantallaInicio = () => {
         </div>
 
         {/* Ionic Overlays */}
-        <IonActionSheet
-          isOpen={showActionSheet}
-          onDidDismiss={() => setShowActionSheet(false)}
-          header={`${user?.name ?? 'Usuario'} - ${user?.email ?? ''}`}
-          buttons={[
-            {
-              text: 'Ver perfil',
-              icon: personOutline,
-              handler: () => setShowProfileModal(true)
-            },
-            {
-              text: 'Catálogo',
-              icon: listOutline,
-              handler: () => router.push('/productos')
-            },
-            {
-              text: 'Cerrar sesión',
-              role: 'destructive',
-              icon: logOutOutline,
-              handler: () => setShowLogoutAlert(true)
-            },
-            {
-              text: 'Cancelar',
-              icon: closeOutline,
-              role: 'cancel'
-            }
-          ]}
-        />
+        {/* Menú Avartar Premium (Popover) */}
+        <IonPopover
+          isOpen={popoverState.show}
+          event={popoverState.event}
+          onDidDismiss={() => setPopoverState({ show: false, event: undefined })}
+          className="user-menu-popover"
+          alignment="end"
+          side="bottom"
+          keyboardClose={false}
+        >
+          <div className="ump-container">
+            <div className="ump-header">
+              <span className="ump-name">{user?.name ?? 'Usuario'}</span>
+              <span className="ump-email">{user?.email ?? ''}</span>
+            </div>
+            
+            <div className="ump-divider" />
+            
+            <div className="ump-actions">
+              <button 
+                className="ump-btn" 
+                onClick={() => { setPopoverState({ show: false }); setShowProfileModal(true); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={personOutline} /></div>
+                <span>Mi perfil</span>
+              </button>
+              
+              <button 
+                className="ump-btn" 
+                onClick={() => { setPopoverState({ show: false }); router.push('/productos'); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={listOutline} /></div>
+                <span>Ir al catálogo</span>
+              </button>
+            </div>
+            
+            <div className="ump-divider" />
+            
+            <div className="ump-actions">
+              <button 
+                className="ump-btn ump-danger" 
+                onClick={() => { setPopoverState({ show: false }); setShowLogoutAlert(true); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={logOutOutline} /></div>
+                <span>Cerrar sesión</span>
+              </button>
+            </div>
+          </div>
+        </IonPopover>
 
-        <IonAlert
-          isOpen={showLogoutAlert}
-          onDidDismiss={() => setShowLogoutAlert(false)}
-          header="Cerrar sesión"
-          message="¿Estás seguro que deseas salir de tu cuenta?"
-          buttons={[
-            {
-              text: 'Cancelar',
-              role: 'cancel',
-            },
-            {
-              text: 'Cerrar sesión',
-              role: 'destructive',
-              handler: handleLogout
-            }
-          ]}
-        />
+        {/* Modal Confirmación Logout Premium Centrado */}
+        <IonModal 
+          isOpen={showLogoutAlert} 
+          onDidDismiss={() => setShowLogoutAlert(false)} 
+          className="logout-modal-premium center-modal"
+          backdropDismiss={true}
+        >
+          <div className="lm-container">
+            <div className="lm-icon-wrapper">
+              <div className="lm-icon-bg pulse-anim">
+                <IonIcon icon={logOutOutline} className="lm-icon" />
+              </div>
+            </div>
+            
+            <h2 className="lm-title">¿Cerrar sesión?</h2>
+            <p className="lm-subtitle">
+              Estás a punto de salir de tu cuenta personal. Tendrás que ingresar tus credenciales nuevamente para acceder.
+            </p>
+            
+            <div className="lm-actions">
+              <button className="lm-btn lm-btn-cancel" onClick={() => setShowLogoutAlert(false)}>
+                Mejor me quedo
+              </button>
+              <button className="lm-btn lm-btn-confirm" onClick={handleLogout}>
+                Sí, salir
+                <IonIcon icon={logOutOutline} style={{ marginLeft: '6px' }} />
+              </button>
+            </div>
+          </div>
+        </IonModal>
 
         {/* Custom Profile Modal with dark styling */}
         <IonModal isOpen={showProfileModal} onDidDismiss={() => setShowProfileModal(false)} className="dark-modal" initialBreakpoint={1} breakpoints={[0, 1]}>

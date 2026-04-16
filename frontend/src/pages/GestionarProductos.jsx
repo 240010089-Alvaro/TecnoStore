@@ -42,7 +42,7 @@ const GestionarProductos = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    if (!user?.id) {
+    if (!user?.id || !user.empresa) {
        router.push('/login', 'back', 'replace');
        return;
     }

@@ -12,6 +12,10 @@ import PerfilProveedor from './pages/PerfilProveedor';
 import Productos from './pages/Productos';
 import GestionarProductos from './pages/GestionarProductos';
 
+/* Context */
+import { CartProvider } from './context/CartContext';
+
+
 setupIonicReact({
   mode: 'md',
 });
@@ -19,8 +23,9 @@ setupIonicReact({
 const App = () => {
   return (
     <IonApp>
-      <IonReactRouter>
-        <IonRouterOutlet>
+      <CartProvider>
+        <IonReactRouter>
+          <IonRouterOutlet>
           <Route exact path="/" component={Landing} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/PantallaInicio" component={PantallaInicio} />
@@ -29,8 +34,9 @@ const App = () => {
           <Route exact path="/productos" component={Productos} />
           <Route exact path="/gestionar-productos" component={GestionarProductos} />
           <Redirect to="/" />
-        </IonRouterOutlet>
-      </IonReactRouter>
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </CartProvider>
     </IonApp>
   );
 };

@@ -12,7 +12,8 @@ import {
   IonToolbar,
   IonTitle,
   IonButtons,
-  IonButton
+  IonButton,
+  IonPopover
 } from '@ionic/react';
 import { 
   flashOutline, 
@@ -46,18 +47,20 @@ const PanelProveedor = () => {
   const [proveedor, setProveedor] = useState(null);
   
   // Ionic Overlay States
-  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [popoverState, setPopoverState] = useState({ show: false, event: undefined });
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState('success');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    setProveedor(user);
-    if (!user || !user.id) {
+    if (!user || (!user.empresa)) {
        router.push('/login', 'back', 'replace');
+       return;
     }
+    setProveedor(user);
   }, [router]);
 
   const handleChange = async (e) => {
@@ -66,8 +69,9 @@ const PanelProveedor = () => {
       if (file) {
         const options = { maxSizeMB: 2, maxWidthOrHeight: 1920 };
         try {
-          const compressedFile = await imageCompression(file, options);
-          setProducto({ ...producto, [e.target.name]: compressedFile });
+          const compressedBlob = await imageCompression(file, options);
+          const finalFile = new File([compressedBlob], file.name, { type: file.type });
+          setProducto({ ...producto, [e.target.name]: finalFile });
         } catch (error) {
           console.error(error);
           setToastMessage("Error al comprimir la imagen.");
@@ -116,9 +120,8 @@ const PanelProveedor = () => {
 
       const data = await res.json();
       
-      setToastMessage("Producto publicado 🚀");
-      setToastColor("success");
-      setShowToast(true);
+      setShowSuccessModal(true);
+      setTimeout(() => setShowSuccessModal(false), 1500);
 
       setProducto({
         nombre: "",
@@ -144,7 +147,7 @@ const PanelProveedor = () => {
 
   const cerrarSesion = () => {
     localStorage.removeItem("user");
-    router.push("/", "back", "replace");
+    window.location.replace("/");
   };
 
   const inicial = proveedor?.name?.charAt(0).toUpperCase() || "?";
@@ -172,7 +175,7 @@ const PanelProveedor = () => {
               </div>
 
               {/* PERFIL */}
-              <div className="pp-avbtn" onClick={() => setShowActionSheet(true)}>
+              <div className="pp-avbtn" onClick={(e) => setPopoverState({ show: true, event: e.nativeEvent })}>
                 <div className="pp-av">{inicial}</div>
                 <span className="pp-avname hide-mobile">
                   {proveedor?.name || "Proveedor"}
@@ -234,6 +237,13 @@ const PanelProveedor = () => {
                       <div className="pp-fileinput-wrapper">
                         <IonIcon icon={imageOutline} className="pp-file-icon" />
                         <input type="file" name="imagen" accept="image/*" onChange={handleChange} className="pp-fileinput" />
+                        {producto.imagen ? (
+                          <span style={{ marginLeft: "10px", fontSize: "14px", color: "#10b981", fontWeight: "500" }}>
+                            {producto.imagen.name}
+                          </span>
+                        ) : (
+                          <span style={{ marginLeft: "10px", fontSize: "14px", color: "#6b7280" }}>Seleccionar imagen...</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -331,52 +341,86 @@ const PanelProveedor = () => {
         </div>
 
         {/* Ionic Components */}
-        <IonActionSheet
-          isOpen={showActionSheet}
-          onDidDismiss={() => setShowActionSheet(false)}
-          header={(proveedor?.name || "Proveedor") + " - " + (proveedor?.email || "")}
-          buttons={[
-            {
-              text: 'Gestionar productos',
-              icon: cubeOutline,
-              handler: () => router.push('/gestionar-productos')
-            },
-            {
-              text: 'Ver perfil',
-              icon: personOutline,
-              handler: () => router.push('/perfil-proveedor')
-            },
-            {
-              text: 'Cerrar sesión',
-              role: 'destructive',
-              icon: logOutOutline,
-              handler: () => setShowLogoutAlert(true)
-            },
-            {
-              text: 'Cancelar',
-              icon: closeOutline,
-              role: 'cancel'
-            }
-          ]}
-        />
+        {/* Menú Avartar Premium (Popover) */}
+        <IonPopover
+          isOpen={popoverState.show}
+          event={popoverState.event}
+          onDidDismiss={() => setPopoverState({ show: false, event: undefined })}
+          className="user-menu-popover light-popover"
+          alignment="end"
+          side="bottom"
+          keyboardClose={false}
+        >
+          <div className="ump-container">
+            <div className="ump-header">
+              <span className="ump-name">{proveedor?.name ?? 'Proveedor'}</span>
+              <span className="ump-email">{proveedor?.email ?? ''}</span>
+            </div>
+            
+            <div className="ump-divider" />
+            
+            <div className="ump-actions">
+              <button 
+                className="ump-btn" 
+                onClick={() => { setPopoverState({ show: false }); router.push('/gestionar-productos'); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={cubeOutline} /></div>
+                <span>Gestionar productos</span>
+              </button>
+              
+              <button 
+                className="ump-btn" 
+                onClick={() => { setPopoverState({ show: false }); router.push('/perfil-proveedor'); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={personOutline} /></div>
+                <span>Ver perfil</span>
+              </button>
+            </div>
+            
+            <div className="ump-divider" />
+            
+            <div className="ump-actions">
+              <button 
+                className="ump-btn ump-danger" 
+                onClick={() => { setPopoverState({ show: false }); setShowLogoutAlert(true); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={logOutOutline} /></div>
+                <span>Cerrar sesión</span>
+              </button>
+            </div>
+          </div>
+        </IonPopover>
 
-        <IonAlert
-          isOpen={showLogoutAlert}
-          onDidDismiss={() => setShowLogoutAlert(false)}
-          header="¿Cerrar sesión?"
-          message="Se cerrará tu sesión actual en el panel de proveedor."
-          buttons={[
-            {
-              text: 'Cancelar',
-              role: 'cancel',
-            },
-            {
-              text: 'Sí, salir',
-              role: 'destructive',
-              handler: cerrarSesion
-            }
-          ]}
-        />
+        {/* Modal Confirmación Logout Premium Centrado */}
+        <IonModal 
+          isOpen={showLogoutAlert} 
+          onDidDismiss={() => setShowLogoutAlert(false)} 
+          className="logout-modal-premium center-modal"
+          backdropDismiss={true}
+        >
+          <div className="lm-container">
+            <div className="lm-icon-wrapper">
+              <div className="lm-icon-bg pulse-anim">
+                <IonIcon icon={logOutOutline} className="lm-icon" />
+              </div>
+            </div>
+            
+            <h2 className="lm-title">¿Cerrar sesión?</h2>
+            <p className="lm-subtitle">
+              Se cerrará tu sesión actual en el panel de proveedor. Deberás iniciar sesión de nuevo para administrar tus productos.
+            </p>
+            
+            <div className="lm-actions">
+              <button className="lm-btn lm-btn-cancel" onClick={() => setShowLogoutAlert(false)}>
+                Mejor me quedo
+              </button>
+              <button className="lm-btn lm-btn-confirm" onClick={cerrarSesion}>
+                Sí, salir
+                <IonIcon icon={logOutOutline} style={{ marginLeft: '6px' }} />
+              </button>
+            </div>
+          </div>
+        </IonModal>
 
         <IonToast
           isOpen={showToast}
@@ -385,6 +429,25 @@ const PanelProveedor = () => {
           duration={3000}
           color={toastColor}
         />
+
+        {/* Modal Premium de Éxito al Publicar */}
+        <IonModal 
+          isOpen={showSuccessModal} 
+          onDidDismiss={() => setShowSuccessModal(false)}
+          className="pp-success-modal"
+          backdropDismiss={false}
+          animated={true}
+        >
+          <div className="pp-success-container">
+            <div className="pp-success-icon-wrapper">
+              <div className="pp-success-icon-bg">
+                <IonIcon icon={cubeOutline} className="pp-success-icon" />
+              </div>
+            </div>
+            <h2 className="pp-success-title">¡Publicado!</h2>
+            <p className="pp-success-subtitle">El producto ya está en tu catálogo</p>
+          </div>
+        </IonModal>
       </IonContent>
     </IonPage>
   );

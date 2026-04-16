@@ -22,7 +22,7 @@ const PerfilProveedor = () => {
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("user"));
-    if (!data) {
+    if (!data || !data.empresa) {
       router.push('/login', 'back', 'replace');
     } else {
       setProveedor(data);
@@ -31,7 +31,7 @@ const PerfilProveedor = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    router.push("/", "back", "replace");
+    window.location.replace("/");
   };
 
   if (!proveedor) {

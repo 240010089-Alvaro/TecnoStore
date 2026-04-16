@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   IonContent, 
   IonPage, 
@@ -31,6 +31,14 @@ const Login = () => {
   });
   
   const [errors, setErrors] = useState({});
+  
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      if (user.empresa) router.push("/proveedor", "forward", "replace");
+      else router.push("/PantallaInicio", "forward", "replace");
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

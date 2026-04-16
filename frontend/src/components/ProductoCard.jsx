@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { IonIcon, IonModal } from '@ionic/react';
 import { addOutline, checkmarkOutline, closeOutline, imageOutline } from 'ionicons/icons';
+import { useCart } from '../context/CartContext';
 import './ProductoCard.css';
 
 const CAT_COLORS = {
@@ -12,11 +13,12 @@ const CAT_COLORS = {
   Wearables:   ["#2c5282","#76e4f7"],
 };
 
-const ProductoCard = ({ producto, index = 0 }) => {
+const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
   const [showModal, setShowModal] = useState(false);
   const [proveedor, setProveedor] = useState(null);
   const [imgError, setImgError] = useState(false);
   const [added, setAdded] = useState(false);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     if (producto.proveedor_id) {
@@ -36,8 +38,16 @@ const ProductoCard = ({ producto, index = 0 }) => {
 
   const handleAdd = (e) => {
     e.stopPropagation();
+    if (onRequireAuth && !onRequireAuth()) return;
+    addToCart(producto);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  };
+
+  const handleAddFromModal = () => {
+    if (onRequireAuth && !onRequireAuth()) return;
+    addToCart(producto);
+    setShowModal(false);
   };
 
   return (
@@ -175,7 +185,7 @@ const ProductoCard = ({ producto, index = 0 }) => {
               )}
             </div>
 
-            <button className="pc-cta-btn">Agregar al carrito →</button>
+            <button className="pc-cta-btn" onClick={handleAddFromModal}>Agregar al carrito →</button>
           </div>
         </div>
       </IonModal>
