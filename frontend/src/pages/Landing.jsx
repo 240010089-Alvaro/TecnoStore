@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IonContent, IonPage, IonIcon, useIonRouter } from '@ionic/react';
-import { 
-  flashOutline, 
-  shieldCheckmarkOutline, 
-  rocketOutline, 
-  heartOutline, 
-  peopleOutline, 
+import {
+  flashOutline,
+  shieldCheckmarkOutline,
+  rocketOutline,
+  heartOutline,
+  peopleOutline,
   chatbubblesOutline,
   addOutline,
   checkmarkOutline
@@ -13,24 +13,24 @@ import {
 import './Landing.css';
 
 const PRODUCTOS = [
-  { id:1, img:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&q=80", cat:"Laptops", name:"MacBook Pro M3", price:"$42,999", badge:"Nuevo", badgeColor:"#22d3ee" },
-  { id:2, img:"https://images.unsplash.com/photo-1588508065123-287b28e013da?w=600&q=80", cat:"Smartphones", name:"iPhone 16 Pro Max", price:"$35,500", badge:"Hot", badgeColor:"#f59e0b" },
-  { id:3, img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80", cat:"Audio", name:"Sony WH-1000XM5", price:"$8,999", badge:"Oferta", badgeColor:"#34d399" },
-  { id:4, img:"https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80", cat:"Wearables", name:"Apple Watch Ultra 2", price:"$16,500", badge:"Nuevo", badgeColor:"#22d3ee" },
-  { id:5, img:"https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=600&q=80", cat:"Laptops", name:"Dell XPS 15 OLED", price:"$38,000", badge:"Top", badgeColor:"#818cf8" },
-  { id:6, img:"https://images.unsplash.com/photo-1585298723682-7115561c51b7?w=600&q=80", cat:"Audio", name:"AirPods Pro 2da Gen", price:"$6,499", badge:"Oferta", badgeColor:"#34d399" },
-  { id:7, img:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80", cat:"Gaming", name:"Razer BlackWidow V4", price:"$4,299", badge:"Hot", badgeColor:"#f59e0b" },
+  { id: 1, img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&q=80", cat: "Laptops", name: "MacBook Pro M3", price: "$42,999", badge: "Nuevo", badgeColor: "#22d3ee" },
+  { id: 2, img: "https://images.unsplash.com/photo-1588508065123-287b28e013da?w=600&q=80", cat: "Smartphones", name: "iPhone 16 Pro Max", price: "$35,500", badge: "Hot", badgeColor: "#f59e0b" },
+  { id: 3, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80", cat: "Audio", name: "Sony WH-1000XM5", price: "$8,999", badge: "Oferta", badgeColor: "#34d399" },
+  { id: 4, img: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80", cat: "Wearables", name: "Apple Watch Ultra 2", price: "$16,500", badge: "Nuevo", badgeColor: "#22d3ee" },
+  { id: 5, img: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=600&q=80", cat: "Laptops", name: "Dell XPS 15 OLED", price: "$38,000", badge: "Top", badgeColor: "#818cf8" },
+  { id: 6, img: "https://images.unsplash.com/photo-1585298723682-7115561c51b7?w=600&q=80", cat: "Audio", name: "AirPods Pro 2da Gen", price: "$6,499", badge: "Oferta", badgeColor: "#34d399" },
+  { id: 7, img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&q=80", cat: "Gaming", name: "Razer BlackWidow V4", price: "$4,299", badge: "Hot", badgeColor: "#f59e0b" },
 ];
 
-const MARQUEE_ITEMS = ["MacBook Pro","iPhone 16","Sony WH-1000XM5","Samsung Galaxy S25","AirPods Pro","LG OLED","Razer Gaming","DJI Drone","iPad Pro","RTX 5090","PS5 Pro","Meta Quest 3","Apple Watch Ultra"];
+const MARQUEE_ITEMS = ["MacBook Pro", "iPhone 16", "Sony WH-1000XM5", "Samsung Galaxy S25", "AirPods Pro", "LG OLED", "Razer Gaming", "DJI Drone", "iPad Pro", "RTX 5090", "PS5 Pro", "Meta Quest 3", "Apple Watch Ultra"];
 
 const FEATURES = [
-  { icon: shieldCheckmarkOutline, color:"#3b82f6", title:"Pagos Blindados", desc:"Cifrado SSL y autenticación de dos factores en cada transacción." },
-  { icon: flashOutline, color:"#06b6d4", title:"Tech de Punta", desc:"Los últimos lanzamientos disponibles antes que en cualquier otra tienda." },
-  { icon: rocketOutline, color:"#34d399", title:"Envío Express", desc:"24-48h con rastreo en tiempo real directo desde tu dashboard." },
-  { icon: heartOutline, color:"#f59e0b", title:"Garantía Oficial", desc:"Todos los productos con garantía del fabricante y soporte dedicado." },
-  { icon: peopleOutline, color:"#818cf8", title:"Red de Proveedores", desc:"Más de 340 vendedores verificados compitiendo por el mejor precio." },
-  { icon: chatbubblesOutline, color:"#f472b6", title:"Soporte 24/7", desc:"Chat en vivo, email y teléfono disponibles toda la semana." },
+  { icon: shieldCheckmarkOutline, color: "#3b82f6", title: "Pagos Blindados", desc: "Cifrado SSL y autenticación de dos factores en cada transacción." },
+  { icon: flashOutline, color: "#06b6d4", title: "Tech de Punta", desc: "Los últimos lanzamientos disponibles antes que en cualquier otra tienda." },
+  { icon: rocketOutline, color: "#34d399", title: "Envío Express", desc: "24-48h con rastreo en tiempo real directo desde tu dashboard." },
+  { icon: heartOutline, color: "#f59e0b", title: "Garantía Oficial", desc: "Todos los productos con garantía del fabricante y soporte dedicado." },
+  { icon: peopleOutline, color: "#818cf8", title: "Red de Proveedores", desc: "Más de 340 vendedores verificados compitiendo por el mejor precio." },
+  { icon: chatbubblesOutline, color: "#f472b6", title: "Soporte 24/7", desc: "Chat en vivo, email y teléfono disponibles toda la semana." },
 ];
 
 /* Counter component */
@@ -87,7 +87,7 @@ const Landing = () => {
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem("user"));
     if (u) setUser(u);
-    
+
     const t = setInterval(() => setHeroImg(i => (i + 1) % PRODUCTOS.length), 3500);
     return () => clearInterval(t);
   }, []);
@@ -163,7 +163,7 @@ const Landing = () => {
               </div>
 
               <div className="ld-hero-stats">
-                {[{to:12400,s:"+",l:"Productos"},{to:8200,s:"+",l:"Clientes"},{to:340,s:"+",l:"Proveedores"},{to:99,s:"%",l:"Satisfacción"}].map(({to,s,l}) => (
+                {[{ to: 12400, s: "+", l: "Productos" }, { to: 8200, s: "+", l: "Clientes" }, { to: 340, s: "+", l: "Proveedores" }, { to: 99, s: "%", l: "Satisfacción" }].map(({ to, s, l }) => (
                   <div key={l} className="ld-stat-item">
                     <div className="ld-stat-num"><Counter to={to} suffix={s} /></div>
                     <div className="ld-stat-lbl">{l}</div>
@@ -216,7 +216,7 @@ const Landing = () => {
             <div className="ld-prods-grid">
               {PRODUCTOS.map((p) => <PCard key={p.id} p={p} />)}
             </div>
-            <div style={{ textAlign:"center", marginTop: 48 }}>
+            <div style={{ textAlign: "center", marginTop: 48 }}>
               <button className="ld-btn-ghost" onClick={() => router.push("/productos")}>
                 Ver catálogo completo →
               </button>
@@ -228,15 +228,18 @@ const Landing = () => {
             <p className="ld-section-eyebrow">¿Por qué TecnoStore?</p>
             <h2 className="ld-section-title">Todo lo que necesitas,<br />en <em>un solo lugar</em></h2>
             <div className="ld-feat-grid">
-              {FEATURES.map(f => (
-                <div key={f.title} className="ld-feat-card">
-                  <div className="ld-feat-ico" style={{ background: `${f.color}18`, border: `1px solid ${f.color}30` }}>
-                    <IonIcon icon={f.icon} style={{ color: f.color, fontSize: '22px' }} />
+              {FEATURES.map(f => {
+                const featClass = `feat-${f.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s\/]+/g, '-')}`;
+                return (
+                  <div key={f.title} className={`ld-feat-card ${featClass}`}>
+                    <div className="ld-feat-ico" style={{ background: `${f.color}18`, border: `1px solid ${f.color}30` }}>
+                      <IonIcon icon={f.icon} style={{ color: f.color, fontSize: '22px' }} className="ld-feat-ion" />
+                    </div>
+                    <p className="ld-feat-title">{f.title}</p>
+                    <p className="ld-feat-desc">{f.desc}</p>
                   </div>
-                  <p className="ld-feat-title">{f.title}</p>
-                  <p className="ld-feat-desc">{f.desc}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { IonIcon, IonModal } from '@ionic/react';
-import { addOutline, checkmarkOutline, closeOutline, imageOutline } from 'ionicons/icons';
+import { addOutline, checkmarkOutline, closeOutline, imageOutline, cartOutline, flashOutline } from 'ionicons/icons';
 import { useCart } from '../context/CartContext';
 import './ProductoCard.css';
 
@@ -70,7 +70,7 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
           )}
 
           {producto.categoria && (
-            <span className="pc-badge" style={{ background: 'rgba(255,255,255,.92)', color: c1, border: `1px solid ${c1}33` }}>
+            <span className="pc-badge" style={{ background: 'rgba(5, 8, 16, 0.85)', color: c2, border: `1px solid ${c1}44`, backdropFilter: 'blur(4px)' }}>
               {producto.categoria}
             </span>
           )}
@@ -185,7 +185,12 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
               )}
             </div>
 
-            <button className="pc-cta-btn" onClick={handleAddFromModal}>Agregar al carrito →</button>
+            <div className="pc-modal-actions">
+              <button className="pc-cta-btn primary" onClick={() => { handleAddFromModal(); /* Lógica de redirección a checkout en un futuro */ }}>
+                <IonIcon icon={flashOutline} style={{ fontSize: '18px' }} />
+                Comprar
+              </button>
+            </div>
           </div>
         </div>
       </IonModal>

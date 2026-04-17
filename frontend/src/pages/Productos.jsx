@@ -8,11 +8,16 @@ import {
   IonModal,
   IonButton
 } from '@ionic/react';
-import { arrowBackOutline, searchOutline, cubeOutline, cartOutline, logInOutline } from 'ionicons/icons';
+import { 
+  arrowBackOutline, searchOutline, cubeOutline, cartOutline, logInOutline,
+  laptopOutline, phonePortraitOutline, hardwareChipOutline, watchOutline
+} from 'ionicons/icons';
 import ProductoCard from "../components/ProductoCard";
 import CartModal from "../components/CartModal";
 import { useCart } from "../context/CartContext";
 import './Productos.css';
+
+const bgIcons = [laptopOutline, phonePortraitOutline, hardwareChipOutline, watchOutline];
 
 const Productos = () => {
   const router = useIonRouter();
@@ -56,6 +61,23 @@ const Productos = () => {
     <IonPage>
       <IonContent fullscreen className="pg-ion-content">
         <div className="pg-root pg-bg">
+          {/* Animated Background */}
+          <div className="pg-anim-bg">
+            {[...Array(14)].map((_, i) => (
+              <IonIcon 
+                key={i} 
+                icon={bgIcons[i % bgIcons.length]} 
+                className="pg-anim-icon" 
+                style={{ 
+                  left: `${(i * 7) + Math.random() * 3}%`, 
+                  animationDuration: `${14 + Math.random() * 20}s`, 
+                  animationDelay: `-${Math.random() * 15}s`,
+                  fontSize: `${18 + Math.random() * 28}px`,
+                  transform: `rotate(${Math.random() * 45}deg)`
+                }} 
+              />
+            ))}
+          </div>
           {/* Header */}
           <header className="pg-header">
             <div className="pg-header-inner">
