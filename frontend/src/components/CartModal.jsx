@@ -10,7 +10,7 @@ import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import './CartModal.css';
 
 const CartModal = ({ isOpen, onDismiss, onRequireAuth }) => {
-  const { cart, removeFromCart, updateQuantity, cartTotal, cartItemCount, clearCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, cartTotal, cartItemCount, clearCart, showToast } = useCart();
   const [removingId, setRemovingId] = useState(null);
   const [showPaypal, setShowPaypal] = useState(false);
   const overlayRef = useRef(null);
@@ -19,10 +19,11 @@ const CartModal = ({ isOpen, onDismiss, onRequireAuth }) => {
     if (e.target === overlayRef.current) onDismiss();
   };
 
-  const handleRemove = (id) => {
+  const handleRemove = async (id) => {
     setRemovingId(id);
-    setTimeout(() => {
-      removeFromCart(id);
+    // Wait for animation, then actually remove
+    setTimeout(async () => {
+      await removeFromCart(id);
       setRemovingId(null);
     }, 350);
   };
@@ -136,12 +137,7 @@ const CartModal = ({ isOpen, onDismiss, onRequireAuth }) => {
                         <span className="cm-qty-value">{item.cantidad}</span>
                         <button
                           className="cm-qty-btn cm-qty-plus"
-                          onClick={async () => {
-                            const res = await updateQuantity(item.id, 1);
-                            if (res && res.success === false) {
-                              alert(res.message);
-                            }
-                          }}
+                          onClick={() => updateQuantity(item.id, 1)}
                           aria-label="Aumentar cantidad"
                         >
                           <IonIcon icon={addOutline} />
@@ -207,7 +203,7 @@ const CartModal = ({ isOpen, onDismiss, onRequireAuth }) => {
                       return actions.order.capture().then((details) => {
                         clearCart();
                         onDismiss();
-                        setTimeout(() => alert("¡Pago procesado correctamente!"), 300);
+                        showToast('¡Pago procesado correctamente!', 'success');
                       });
                     }}
                   />

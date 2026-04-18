@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   IonContent, 
   IonPage, 
   IonIcon, 
-  useIonRouter,
-  IonToast
+  useIonRouter
 } from '@ionic/react';
-import axios from 'axios';
 import { 
   flashOutline, 
   shieldCheckmarkOutline, 
@@ -14,16 +12,16 @@ import {
   peopleOutline, 
   personOutline, 
   businessOutline,
-  arrowForwardOutline,
-  closeCircleOutline
+  arrowForwardOutline
 } from 'ionicons/icons';
+import { useCart } from '../context/CartContext';
 import './Login.css';
 
 const Login = () => {
   const router = useIonRouter();
+  const { showToast } = useCart();
   const [isLogin, setIsLogin] = useState(true);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const [form, setForm] = useState({
     name: "", email: "", password: "", rol: "cliente",
@@ -31,9 +29,6 @@ const Login = () => {
   });
   
   const [errors, setErrors] = useState({});
-  
-  // Se eliminó la redirección automática para permitir cambio de cuenta o ver el formulario
-
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -46,76 +41,80 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent double submit
+    setLoading(true);
+
+    const url = isLogin
+      ? form.rol === "proveedor"
+        ? "http://localhost:8000/api/login-proveedor"
+        : "http://localhost:8000/api/login"
+      : form.rol === "proveedor"
+        ? "http://localhost:8000/api/register-proveedor"
+        : "http://localhost:8000/api/register";
+
+    const cleanEmail = form.email.trim();
+    const cleanPassword = form.password.trim();
+
+    const data = isLogin
+      ? { email: cleanEmail, password: cleanPassword }
+      : form.rol === "proveedor"
+        ? { 
+            name: form.name.trim(), 
+            email: cleanEmail, 
+            password: cleanPassword, 
+            empresa: form.empresa.trim(), 
+            telefono: form.telefono.trim(), 
+            direccion: form.direccion.trim() 
+          }
+        : { name: form.name.trim(), email: cleanEmail, password: cleanPassword };
+
     try {
-      const url = isLogin
-        ? form.rol === "proveedor"
-          ? "http://localhost:8000/api/login-proveedor"
-          : "http://localhost:8000/api/login"
-        : form.rol === "proveedor"
-          ? "http://localhost:8000/api/register-proveedor"
-          : "http://localhost:8000/api/register";
-
-      const cleanEmail = form.email.trim();
-      const cleanPassword = form.password.trim();
-
-      const data = isLogin
-        ? { email: cleanEmail, password: cleanPassword }
-        : form.rol === "proveedor"
-          ? { 
-              name: form.name.trim(), 
-              email: cleanEmail, 
-              password: cleanPassword, 
-              empresa: form.empresa.trim(), 
-              telefono: form.telefono.trim(), 
-              direccion: form.direccion.trim() 
-            }
-          : { name: form.name.trim(), email: cleanEmail, password: cleanPassword };
-
-      const res = await axios.post(url, data);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
       
-      localStorage.setItem("user", JSON.stringify(res.data.user ?? res.data.proveedor));
+      const resData = await response.json();
       
-      // Navigate based on role
-      if (form.rol === "proveedor") {
-        router.push("/proveedor", "forward", "replace");
-      } else {
-        router.push("/PantallaInicio", "forward", "replace");
+      if (response.ok) {
+        // Save user and navigate INSTANTLY
+        const userData = resData.user ?? resData.proveedor;
+        localStorage.setItem("user", JSON.stringify(userData));
+        
+        // Navigate immediately — no delay
+        if (form.rol === "proveedor") {
+          router.push("/proveedor", "forward", "replace");
+        } else {
+          router.push("/PantallaInicio", "forward", "replace");
+        }
+        return; // Don't setLoading(false) — we're leaving
       }
 
-    } catch (err) {
-      console.error(err);
-      if (err.response) {
-        const message = err.response.data.message || "";
-        const validationErrors = err.response.data.errors || {};
-
-        if (err.response.status === 422 && Object.keys(validationErrors).length > 0) {
-          // Map all validation errors to the state
-          const newErrors = {};
-          for (const key in validationErrors) {
-            newErrors[key] = validationErrors[key][0]; // Toma el primer mensaje de error para el campo
-          }
-          setErrors(newErrors);
-          
-          setToastMessage("Por favor corrige los errores del formulario");
-          setShowToast(true);
-        } else if (err.response.status === 401 || err.response.status === 404) {
-          // Manejo de errores específicos de login (no encontrado o pass incorrecta)
-          if (message.toLowerCase().includes("no encontrado")) {
-            setErrors({ email: message });
-          } else if (message.toLowerCase().includes("incorrecta")) {
-            setErrors({ password: message });
-          } else {
-            setToastMessage(message);
-            setShowToast(true);
-          }
+      // Handle errors
+      if (response.status === 422 && resData.errors) {
+        const newErrors = {};
+        for (const key in resData.errors) {
+          newErrors[key] = resData.errors[key][0];
+        }
+        setErrors(newErrors);
+        showToast("Por favor corrige los errores del formulario", "error");
+      } else if (response.status === 401 || response.status === 404) {
+        const message = resData.message || "";
+        if (message.toLowerCase().includes("no encontrado")) {
+          setErrors({ email: message });
+        } else if (message.toLowerCase().includes("incorrecta")) {
+          setErrors({ password: message });
         } else {
-          setToastMessage(message || "Error al procesar la solicitud");
-          setShowToast(true);
+          showToast(message, "error");
         }
       } else {
-        setToastMessage("Error de conexión con el servidor");
-        setShowToast(true);
+        showToast(resData.message || "Error al procesar la solicitud", "error");
       }
+    } catch (err) {
+      showToast("Error de conexión con el servidor", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,7 +132,7 @@ const Login = () => {
           <div className="lg-orb lg-orb-2" />
           <div className="lg-orb lg-orb-3" />
 
-          {/* Left Column - Branding (Hidden on small screens via CSS) */}
+          {/* Left Column - Branding */}
           <div className="lg-left">
             <div className="lg-brand-logo" onClick={() => router.push('/')}>
               <div className="lg-brand-mark">
@@ -278,11 +277,22 @@ const Login = () => {
 
                 <button
                   type="submit"
-                  className={`lg-submit ${isProveedor ? "submit-vendor" : "submit-client"}`}>
-                  {isLogin
-                    ? `Entrar como ${isProveedor ? "Proveedor" : "Cliente"}`
-                    : `Registrarme como ${isProveedor ? "Proveedor" : "Cliente"}`}
-                  <IonIcon icon={arrowForwardOutline} style={{ marginLeft: '10px' }} />
+                  className={`lg-submit ${isProveedor ? "submit-vendor" : "submit-client"} ${loading ? "lg-submit-loading" : ""}`}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="lg-spinner" />
+                      Conectando...
+                    </>
+                  ) : (
+                    <>
+                      {isLogin
+                        ? `Entrar como ${isProveedor ? "Proveedor" : "Cliente"}`
+                        : `Registrarme como ${isProveedor ? "Proveedor" : "Cliente"}`}
+                      <IonIcon icon={arrowForwardOutline} style={{ marginLeft: '10px' }} />
+                    </>
+                  )}
                 </button>
               </form>
 
@@ -304,15 +314,6 @@ const Login = () => {
             </div>
           </div>
         </div>
-
-        <IonToast
-          isOpen={showToast}
-          onDidDismiss={() => setShowToast(false)}
-          message={toastMessage}
-          duration={3000}
-          icon={closeCircleOutline}
-          color="danger"
-        />
       </IonContent>
     </IonPage>
   );

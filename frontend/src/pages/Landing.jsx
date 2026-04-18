@@ -113,9 +113,6 @@ const PCard = ({ p, idx, user, onRequireAuth }) => {
                 if (res.success) {
                   setAdded(true); 
                   setTimeout(() => setAdded(false), 700); 
-                } else {
-                  // Podríamos usar un alert o toast aquí si falla por stock
-                  alert(res.message);
                 }
               }}
           >

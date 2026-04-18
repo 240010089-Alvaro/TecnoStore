@@ -272,6 +272,14 @@
   flex-shrink: 0;
 }
 
+.pi-avatar-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .pi-avatar-name {
   font-size: 13px;
   font-weight: 500;

@@ -3,10 +3,7 @@ import {
   IonContent, 
   IonPage, 
   useIonRouter,
-  IonActionSheet,
-  IonAlert,
   IonModal,
-  IonButton,
   IonIcon,
   IonPopover
 } from '@ionic/react';
@@ -20,6 +17,9 @@ import {
   closeOutline,
   addOutline
 } from 'ionicons/icons';
+import { useCart } from '../context/CartContext';
+import CartModal from '../components/CartModal';
+import ClientSettingsModal from '../components/ClientSettingsModal';
 import './PantallaInicio.css';
 
 /* ── Datos categorías ── */
@@ -45,6 +45,8 @@ const MARQUEE = ["MacBook Pro","iPhone 16","Sony XM5","Samsung S25","AirPods Pro
 const PantallaInicio = () => {
   const router = useIonRouter();
   const [user, setUser] = useState(null);
+  const { cartItemCount } = useCart();
+  const [showCart, setShowCart] = useState(false);
   
   // Ionic Overlays states
   const [popoverState, setPopoverState] = useState({ show: false, event: undefined });
@@ -96,13 +98,19 @@ const PantallaInicio = () => {
             </div>
 
             <div className="pi-nav-right">
-              <div className="pi-cart-btn">
+              <div className="pi-cart-btn" onClick={() => setShowCart(true)}>
                 <IonIcon icon={cartOutline} style={{ fontSize: '20px' }} />
-                <span className="pi-cart-badge">0</span>
+                {cartItemCount > 0 && (
+                  <span className="pi-cart-badge">{cartItemCount}</span>
+                )}
               </div>
 
               <div className="pi-avatar-btn" onClick={(e) => setPopoverState({ show: true, event: e.nativeEvent })}>
-                <div className="pi-avatar">{inicial}</div>
+                {user?.avatar ? (
+                  <img src={`http://localhost:8000/avatars/${user.avatar}`} alt="Avatar" className="pi-avatar-img" />
+                ) : (
+                  <div className="pi-avatar">{inicial}</div>
+                )}
                 <span className="pi-avatar-name">{user?.name?.split(" ")[0] ?? "Usuario"}</span>
                 <IonIcon icon={chevronDownOutline} style={{ color: 'rgba(148,163,184,.5)', fontSize: '14px' }} />
               </div>
@@ -305,41 +313,16 @@ const PantallaInicio = () => {
           </div>
         </IonModal>
 
-        {/* Custom Profile Modal with dark styling */}
-        <IonModal isOpen={showProfileModal} onDidDismiss={() => setShowProfileModal(false)} className="dark-modal" initialBreakpoint={1} breakpoints={[0, 1]}>
-          <div className="pi-profile-box" style={{ background: 'rgba(8,12,22,.97)', height: '100%' }}>
-            <div className="pi-profile-header" style={{ padding: '28px', background: 'linear-gradient(135deg,rgba(59,130,246,.12),rgba(6,182,212,.08))', borderBottom: '1px solid rgba(255,255,255,.06)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg,#3b82f6,#06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', fontWeight: 'bold', color: '#fff' }}>
-                {inicial}
-              </div>
-              <div className="pi-profile-header-info">
-                <h3>{user?.name ?? "—"}</h3>
-                <p>{user?.email ?? "—"}</p>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '20px', background: 'rgba(59,130,246,.1)', border: '1px solid rgba(59,130,246,.2)', fontSize: '11px', color: '#60a5fa', fontWeight: '600', marginTop: '6px' }}>
-                  <IonIcon icon={personOutline} /> Cliente
-                </div>
-              </div>
-              <button 
-                onClick={() => setShowProfileModal(false)}
-                style={{ position: 'absolute', top: '16px', right: '16px', width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(255,255,255,.06)', border: 'none', color: '#fff', cursor: 'pointer' }}>
-                <IonIcon icon={closeOutline} />
-              </button>
-            </div>
-            <div className="pi-profile-body" style={{ padding: '24px 28px' }}>
-              {[
-                  { label:"ID de usuario", value:`#${user?.id ?? "—"}` },
-                  { label:"Nombre completo", value: user?.name ?? "—" },
-                  { label:"Correo electrónico", value: user?.email ?? "—" },
-                  { label:"Miembro desde", value: user?.created_at ? new Date(user.created_at).toLocaleDateString("es-MX", { year:"numeric", month:"long", day:"numeric" }) : "—" },
-                ].map(({ label, value }) => (
-                  <div key={label} className="pi-profile-field">
-                    <p className="pi-profile-label">{label}</p>
-                    <p className="pi-profile-value">{value}</p>
-                  </div>
-              ))}
-            </div>
-          </div>
-        </IonModal>
+        {/* Client Settings Modal */}
+        <ClientSettingsModal 
+          isOpen={showProfileModal} 
+          onDismiss={() => setShowProfileModal(false)} 
+          user={user}
+          onUpdateUser={(updatedUser) => setUser(updatedUser)}
+        />
+
+        {/* Cart Modal — uses same context as Productos page */}
+        <CartModal isOpen={showCart} onDismiss={() => setShowCart(false)} />
 
       </IonContent>
     </IonPage>

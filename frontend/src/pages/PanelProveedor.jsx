@@ -206,7 +206,11 @@ const PanelProveedor = () => {
 
               {/* PERFIL */}
               <div className="pp-avbtn" onClick={(e) => setPopoverState({ show: true, event: e.nativeEvent })}>
-                <div className="pp-av">{inicial}</div>
+                {proveedor?.avatar ? (
+                    <img src={`http://localhost:8000/avatars/${proveedor.avatar}`} alt="Avatar" className="pp-av-img" />
+                ) : (
+                    <div className="pp-av">{inicial}</div>
+                )}
                 <span className="pp-avname hide-mobile">
                   {proveedor?.name || "Proveedor"}
                 </span>
@@ -304,7 +308,11 @@ const PanelProveedor = () => {
               {/* Perfil */}
               <div className="pp-card pp-profile-card">
                 <div className="pp-profile-header">
-                  <div className="pp-avlg">{inicial}</div>
+                  {proveedor?.avatar ? (
+                    <img src={`http://localhost:8000/avatars/${proveedor.avatar}`} alt="Avatar" className="pp-avlg-img" />
+                  ) : (
+                    <div className="pp-avlg">{inicial}</div>
+                  )}
                   <div>
                     <p className="pp-profile-name">{proveedor?.name || "Proveedor"}</p>
                     <p className="pp-profile-company">{proveedor?.empresa || "Tu empresa"}</p>

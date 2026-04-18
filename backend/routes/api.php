@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\ProfileController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -37,3 +38,7 @@ Route::post('/carrito', [CarritoController::class, 'store']);
 Route::put('/carrito/{user_id}/{producto_id}', [CarritoController::class, 'update']);
 Route::delete('/carrito/{user_id}/{producto_id}', [CarritoController::class, 'destroy']);
 Route::delete('/carrito/{user_id}', [CarritoController::class, 'clear']);
+
+// Perfil y Ajustes
+Route::post('/perfil/cliente/{id}', [ProfileController::class, 'updateCliente']);
+Route::post('/perfil/proveedor/{id}', [ProfileController::class, 'updateProveedor']);

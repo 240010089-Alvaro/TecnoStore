@@ -1,24 +1,56 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { 
   IonContent, 
   IonPage, 
   IonIcon,
   useIonRouter,
-  IonSpinner
+  IonSpinner,
+  IonToast
 } from '@ionic/react';
 import { 
   arrowBackOutline,
-  logOutOutline,
-  mailOutline,
+  cameraOutline,
   businessOutline,
   callOutline,
-  locationOutline
+  locationOutline,
+  mailOutline,
+  personOutline,
+  lockClosedOutline,
+  notificationsOutline,
+  colorPaletteOutline,
+  saveOutline
 } from 'ionicons/icons';
 import './PerfilProveedor.css';
+import { useCart } from '../context/CartContext';
 
 const PerfilProveedor = () => {
-  const [proveedor, setProveedor] = useState(null);
   const router = useIonRouter();
+  const { showToast } = useCart();
+  const [proveedor, setProveedor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'security' | 'settings'
+  const fileInputRef = useRef(null);
+
+  // Form State
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    empresa: "",
+    telefono: "",
+    direccion: "",
+    password: "",
+    avatar_file: null
+  });
+
+  // Settings State (for JSON field)
+  const [ajustes, setAjustes] = useState({
+    notificaciones_email: true,
+    notificaciones_pedidos: true,
+    tema_oscuro: true
+  });
+
+  const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("user"));
@@ -26,17 +58,102 @@ const PerfilProveedor = () => {
       router.push('/login', 'back', 'replace');
     } else {
       setProveedor(data);
+      setFormData({
+        name: data.name || "",
+        email: data.email || "",
+        empresa: data.empresa || "",
+        telefono: data.telefono || "",
+        direccion: data.direccion || "",
+        password: "",
+        avatar_file: null
+      });
+
+      if (data.ajustes) {
+        try {
+          const parsedAjustes = typeof data.ajustes === 'string' ? JSON.parse(data.ajustes) : data.ajustes;
+          setAjustes(prev => ({ ...prev, ...parsedAjustes }));
+        } catch (e) { console.error("Error parsing ajustes", e); }
+      }
+
+      if (data.avatar) {
+        setPreviewImage(`http://localhost:8000/avatars/${data.avatar}`);
+      }
+      setLoading(false);
     }
   }, [router]);
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  if (!proveedor) {
+  const handleToggleAjuste = (key) => {
+    setAjustes(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, avatar_file: file });
+      const currentPreview = URL.createObjectURL(file);
+      setPreviewImage(currentPreview);
+    }
+  };
+
+  const handleSave = async () => {
+    if (saving) return;
+    setSaving(true);
+
+    try {
+      const form = new FormData();
+      form.append("name", formData.name);
+      form.append("email", formData.email);
+      form.append("empresa", formData.empresa);
+      form.append("telefono", formData.telefono);
+      form.append("direccion", formData.direccion);
+      
+      if (formData.password) {
+        form.append("password", formData.password);
+      }
+      if (formData.avatar_file) {
+        form.append("avatar", formData.avatar_file);
+      }
+      form.append("ajustes", JSON.stringify(ajustes));
+
+      const res = await fetch(`http://localhost:8000/api/perfil/proveedor/${proveedor.id}`, {
+        method: 'POST',
+        body: form
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setProveedor(data.user);
+        showToast("Perfil actualizado correctamente", "success");
+        setFormData({ ...formData, password: "" }); // Reset password field
+      } else {
+        showToast(data.message || "Error al guardar los cambios", "error");
+      }
+
+    } catch (err) {
+      console.error(err);
+      showToast("Error de conexión al guardar", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+
+  if (loading) {
     return (
       <IonPage>
         <IonContent fullscreen className="profile-ion-content">
           <div className="profile-loading">
             <IonSpinner name="crescent" color="primary" />
-            <p>Cargando perfil...</p>
           </div>
         </IonContent>
       </IonPage>
@@ -48,83 +165,241 @@ const PerfilProveedor = () => {
   return (
     <IonPage>
       <IonContent fullscreen className="profile-ion-content">
-        <div className="profile-wrap">
-          <div className="profile-hex" />
-          <div className="profile-noise" />
-          <div className="profile-orb profile-orb-1" />
-          <div className="profile-orb profile-orb-2" />
+        <div className="profile-container">
+          
+          {/* Top Navbar */}
+          <div className="prov-nav">
+            <button className="prov-back-btn" onClick={() => router.push("/proveedor")}>
+              <IonIcon icon={arrowBackOutline} />
+              <span>Panel de Control</span>
+            </button>
+            <h1 className="prov-page-title">Ajustes de Cuenta</h1>
+            <div style={{ width: '120px' }}></div> {/* Spacer */}
+          </div>
 
-          <div className="profile-card-container">
-            <div className="profile-card">
-              {/* HEADER */}
-              <div className="profile-card-header">
-                <div className="profile-avatar-lg">
-                  {inicial}
+          <div className="prov-layout">
+            {/* Sidebar TABS */}
+            <div className="prov-sidebar">
+              <button 
+                className={`prov-tab ${activeTab === 'profile' ? 'active' : ''}`}
+                onClick={() => setActiveTab('profile')}
+              >
+                <div className="prov-tab-icon"><IonIcon icon={personOutline} /></div>
+                Información del Perfil
+              </button>
+              <button 
+                className={`prov-tab ${activeTab === 'security' ? 'active' : ''}`}
+                onClick={() => setActiveTab('security')}
+              >
+                <div className="prov-tab-icon"><IonIcon icon={lockClosedOutline} /></div>
+                Seguridad e Inicio
+              </button>
+              <button 
+                className={`prov-tab ${activeTab === 'settings' ? 'active' : ''}`}
+                onClick={() => setActiveTab('settings')}
+              >
+                <div className="prov-tab-icon"><IonIcon icon={notificationsOutline} /></div>
+                Preferencias y Avisos
+              </button>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="prov-content">
+              
+              {/* TAB 1: PERFIL */}
+              {activeTab === 'profile' && (
+                <div className="prov-card animate-fade-in">
+                  <div className="prov-card-header">
+                    <h2>Información de la Empresa</h2>
+                    <p>Actualiza tus datos públicos y de contacto.</p>
+                  </div>
+                  
+                  <div className="prov-card-body">
+                    {/* Avatar Upload */}
+                    <div className="prov-avatar-section">
+                      <div className="prov-avatar-wrapper" onClick={handleImageClick}>
+                        {previewImage ? (
+                          <img src={previewImage} alt="Avatar" className="prov-avatar-img" />
+                        ) : (
+                          <div className="prov-avatar-placeholder">{inicial}</div>
+                        )}
+                        <div className="prov-avatar-overlay">
+                          <IonIcon icon={cameraOutline} />
+                        </div>
+                      </div>
+                      <div className="prov-avatar-info">
+                        <h3>Logo / Foto de Perfil</h3>
+                        <p>Sube una imagen recomendada de al menos 400x400px en formato JPG o PNG.</p>
+                        <button className="prov-btn-outline" onClick={handleImageClick}>Cambiar foto</button>
+                      </div>
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        onChange={handleImageChange} 
+                        accept="image/*" 
+                        style={{ display: 'none' }} 
+                      />
+                    </div>
+
+                    <div className="prov-form-grid">
+                      <div className="prov-input-group">
+                        <label>Nombre Completo</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={personOutline} className="input-icon" />
+                          <input type="text" name="name" value={formData.name} onChange={handleChange} />
+                        </div>
+                      </div>
+                      
+                      <div className="prov-input-group">
+                        <label>Nombre de la Empresa</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={businessOutline} className="input-icon" />
+                          <input type="text" name="empresa" value={formData.empresa} onChange={handleChange} />
+                        </div>
+                      </div>
+
+                      <div className="prov-input-group">
+                        <label>Correo Electrónico</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={mailOutline} className="input-icon" />
+                          <input type="email" name="email" value={formData.email} onChange={handleChange} />
+                        </div>
+                      </div>
+
+                      <div className="prov-input-group">
+                        <label>Teléfono de Contacto</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={callOutline} className="input-icon" />
+                          <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} />
+                        </div>
+                      </div>
+
+                      <div className="prov-input-group full-width">
+                        <label>Dirección Física</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={locationOutline} className="input-icon" />
+                          <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h2 className="profile-name">
-                  {proveedor.name}
-                </h2>
-                <p className="profile-role">
-                  Proveedor
-                </p>
-              </div>
+              )}
 
-              {/* INFO */}
-              <div className="profile-info-grid">
-                <div className="profile-info-item">
-                  <div className="profile-info-icon">
-                    <IonIcon icon={mailOutline} />
+              {/* TAB 2: SEGURIDAD */}
+              {activeTab === 'security' && (
+                <div className="prov-card animate-fade-in">
+                  <div className="prov-card-header">
+                    <h2>Seguridad de la Cuenta</h2>
+                    <p>Gestiona tu contraseña y el acceso a tu cuenta.</p>
                   </div>
-                  <div className="profile-info-text">
-                    <span className="profile-info-label">Correo</span>
-                    <p className="profile-info-value">{proveedor.email}</p>
+                  
+                  <div className="prov-card-body">
+                    <div className="prov-form-grid">
+                      <div className="prov-input-group full-width">
+                        <label>Nueva Contraseña (dejar en blanco para mantener actual)</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={lockClosedOutline} className="input-icon" />
+                          <input 
+                            type="password" 
+                            name="password" 
+                            placeholder="••••••••"
+                            value={formData.password} 
+                            onChange={handleChange} 
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="profile-info-item">
-                  <div className="profile-info-icon">
-                    <IonIcon icon={businessOutline} />
+              {/* TAB 3: PREFERENCIAS */}
+              {activeTab === 'settings' && (
+                <div className="prov-card animate-fade-in">
+                  <div className="prov-card-header">
+                    <h2>Preferencias y Sistema</h2>
+                    <p>Personaliza tu experiencia y las notificaciones que recibes.</p>
                   </div>
-                  <div className="profile-info-text">
-                    <span className="profile-info-label">Empresa</span>
-                    <p className="profile-info-value">{proveedor.empresa}</p>
+                  
+                  <div className="prov-card-body">
+                    <div className="prov-toggles-list">
+                      <div className="prov-toggle-item">
+                        <div className="prov-toggle-info">
+                          <div className="prov-toggle-icon"><IonIcon icon={mailOutline} /></div>
+                          <div>
+                            <h4>Notificaciones Promocionales</h4>
+                            <p>Recibe consejos y ofertas exclusivas en tu correo.</p>
+                          </div>
+                        </div>
+                        <label className="prov-switch">
+                          <input 
+                            type="checkbox" 
+                            checked={ajustes.notificaciones_email} 
+                            onChange={() => handleToggleAjuste('notificaciones_email')} 
+                          />
+                          <span className="prov-slider"></span>
+                        </label>
+                      </div>
+
+                      <div className="prov-toggle-item">
+                        <div className="prov-toggle-info">
+                          <div className="prov-toggle-icon st-blue"><IonIcon icon={notificationsOutline} /></div>
+                          <div>
+                            <h4>Alertas de Pedidos Nuevos</h4>
+                            <p>Envía un email cada vez que un cliente compra un producto tuyo.</p>
+                          </div>
+                        </div>
+                        <label className="prov-switch">
+                          <input 
+                            type="checkbox" 
+                            checked={ajustes.notificaciones_pedidos} 
+                            onChange={() => handleToggleAjuste('notificaciones_pedidos')} 
+                          />
+                          <span className="prov-slider"></span>
+                        </label>
+                      </div>
+
+                      <div className="prov-toggle-item">
+                        <div className="prov-toggle-info">
+                          <div className="prov-toggle-icon st-purple"><IonIcon icon={colorPaletteOutline} /></div>
+                          <div>
+                            <h4>Tema Oscuro Global</h4>
+                            <p>Utilizar interfaz oscura en todos los paneles.</p>
+                          </div>
+                        </div>
+                        <label className="prov-switch">
+                          <input 
+                            type="checkbox" 
+                            checked={ajustes.tema_oscuro} 
+                            onChange={() => handleToggleAjuste('tema_oscuro')} 
+                          />
+                          <span className="prov-slider"></span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="profile-info-item">
-                  <div className="profile-info-icon">
-                    <IonIcon icon={callOutline} />
-                  </div>
-                  <div className="profile-info-text">
-                    <span className="profile-info-label">Teléfono</span>
-                    <p className="profile-info-value">{proveedor.telefono}</p>
-                  </div>
-                </div>
-
-                <div className="profile-info-item">
-                  <div className="profile-info-icon">
-                    <IonIcon icon={locationOutline} />
-                  </div>
-                  <div className="profile-info-text">
-                    <span className="profile-info-label">Dirección</span>
-                    <p className="profile-info-value">
-                      {proveedor.direccion || "No registrada"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* BOTONES */}
-              <div className="profile-actions">
-                <button
-                  onClick={() => router.push("/proveedor")}
-                  className="profile-btn-primary"
-                  style={{ width: '100%' }}
+              {/* Floating Action Bar */}
+              <div className="prov-fab-footer">
+                <button 
+                  className={`prov-btn-primary ${saving ? 'loading' : ''}`} 
+                  onClick={handleSave}
+                  disabled={saving}
                 >
-                  <IonIcon icon={arrowBackOutline} style={{ marginRight: '8px' }} />
-                  Volver al Panel
+                  {saving ? (
+                    <IonSpinner name="crescent" />
+                  ) : (
+                    <>
+                      <IonIcon icon={saveOutline} />
+                      Guardar Cambios
+                    </>
+                  )}
                 </button>
               </div>
+
             </div>
           </div>
         </div>

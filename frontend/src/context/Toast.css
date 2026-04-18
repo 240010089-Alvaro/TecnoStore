@@ -1,0 +1,188 @@
+/* ══════════════════════════════════════════════════════════
+   Toast Notification System — Modern & Professional
+   ══════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+.ts-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .ts-container {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+  }
+}
+
+/* ── Toast Base ── */
+.ts-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  min-width: 280px;
+  max-width: 420px;
+  border-radius: 16px;
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  animation: tsSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* ── Leave Animation ── */
+.ts-leaving {
+  animation: tsSlideOut 0.35s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+@keyframes tsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(80px) scale(0.85);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes tsSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(60px) scale(0.9);
+    filter: blur(4px);
+  }
+}
+
+/* ── Icon Wrap ── */
+.ts-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: tsIconPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.ts-icon-wrap svg {
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes tsIconPop {
+  0% { transform: scale(0) rotate(-45deg); }
+  60% { transform: scale(1.2) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+/* ── Message ── */
+.ts-message {
+  flex: 1;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+
+
+
+/* ═══════════════════════════════════════════════════
+   Toast Type Variants
+   ═══════════════════════════════════════════════════ */
+
+/* ── Success ── */
+.ts-success {
+  background: linear-gradient(135deg, rgba(5, 46, 22, 0.95), rgba(6, 78, 59, 0.92));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #a7f3d0;
+}
+
+.ts-success .ts-icon-wrap {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.ts-success .ts-progress-bar {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+/* ── Error ── */
+.ts-error {
+  background: linear-gradient(135deg, rgba(69, 10, 10, 0.95), rgba(127, 29, 29, 0.92));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fecaca;
+}
+
+.ts-error .ts-icon-wrap {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.ts-error .ts-progress-bar {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+/* ── Warning ── */
+.ts-warning {
+  background: linear-gradient(135deg, rgba(69, 40, 3, 0.95), rgba(120, 53, 15, 0.92));
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fde68a;
+}
+
+.ts-warning .ts-icon-wrap {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.ts-warning .ts-progress-bar {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+/* ── Info ── */
+.ts-info {
+  background: linear-gradient(135deg, rgba(12, 24, 54, 0.95), rgba(23, 37, 84, 0.92));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #bfdbfe;
+}
+
+.ts-info .ts-icon-wrap {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.ts-info .ts-progress-bar {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .ts-toast {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+  }
+}
