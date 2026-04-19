@@ -279,6 +279,12 @@
   box-shadow: 0 0 14px rgba(99,102,241,.35);
 }
 
+.pp-av-img {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  object-fit: cover;
+  box-shadow: 0 0 14px rgba(99,102,241,.35);
+}
+
 .pp-avname { font-size: 13px; font-weight: 500; color: #374151; margin: 0; }
 .pp-chev { color: #9ca3af; font-size: 16px; margin: 0; }
 
@@ -387,6 +393,12 @@
   background: linear-gradient(135deg, #6366f1, #a78bfa);
   display: flex; align-items: center; justify-content: center;
   font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: white;
+  box-shadow: 0 0 22px rgba(99,102,241,.3);
+}
+
+.pp-avlg-img {
+  width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0;
+  object-fit: cover;
   box-shadow: 0 0 22px rgba(99,102,241,.3);
 }
 

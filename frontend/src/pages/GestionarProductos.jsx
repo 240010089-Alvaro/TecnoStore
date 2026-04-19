@@ -148,7 +148,7 @@ const GestionarProductos = () => {
           <header className="gp-header">
             <div className="gp-header-inner">
               <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-                <div className="gp-logo"><IonIcon icon={flashOutline} /></div>
+                <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
                 <div>
                   <p className="gp-htitle">Gestionar Productos</p>
                   <p className="gp-hsub">Edita o elimina tus productos publicados</p>

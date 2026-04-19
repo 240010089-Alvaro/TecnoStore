@@ -134,10 +134,8 @@ const Login = () => {
 
           {/* Left Column - Branding */}
           <div className="lg-left">
-            <div className="lg-brand-logo" onClick={() => router.push('/')}>
-              <div className="lg-brand-mark">
-                <IonIcon icon={flashOutline} />
-              </div>
+            <div className="lg-brand-logo" onClick={() => router.push('/')} style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '120px', height: '120px', objectFit: 'contain' }} />
               <span className="lg-brand-name">TecnoStore</span>
             </div>
 
@@ -184,10 +182,8 @@ const Login = () => {
           <div className="lg-right">
             <div className="lg-form-wrap">
               {/* Mobile Logo */}
-              <div className="lg-mobile-logo" onClick={() => router.push('/')}>
-                <div className="lg-brand-mark small">
-                  <IonIcon icon={flashOutline} />
-                </div>
+              <div className="lg-mobile-logo" onClick={() => router.push('/')} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
                 <span className="mobile-name">TecnoStore</span>
               </div>
 

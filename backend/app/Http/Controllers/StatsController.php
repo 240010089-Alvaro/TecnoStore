@@ -41,21 +41,33 @@ class StatsController extends Controller
             ];
         })->values();
 
+        $productsIds = $products->pluck('id');
+        
+        $activity_data = [];
+        $dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        
+        for ($i = 6; $i >= 0; $i--) {
+            $date = \Carbon\Carbon::now()->subDays($i);
+            $dayName = $dias[$date->dayOfWeek];
+            
+            // Count total items added to carritos in this day
+            // We use 'sum' to reflect the quantity of products requested
+            $pedidos = \App\Models\Carrito::whereIn('producto_id', $productsIds)
+                ->whereDate('created_at', $date->toDateString())
+                ->sum('cantidad');
+                
+            $activity_data[] = [
+                'name' => $dayName,
+                'ventas' => (int) $pedidos
+            ];
+        }
+
         return response()->json([
             'total_products' => $totalProducts,
             'total_stock' => $totalStock,
             'total_categories' => $uniqueCategories,
             'category_distribution' => $categoryData,
-            // Mocked sales data for the "modern" dashboard experience
-            'activity_data' => [
-                ['name' => 'Lun', 'ventas' => rand(1, 5)],
-                ['name' => 'Mar', 'ventas' => rand(2, 8)],
-                ['name' => 'Mie', 'ventas' => rand(3, 10)],
-                ['name' => 'Jue', 'ventas' => rand(2, 6)],
-                ['name' => 'Vie', 'ventas' => rand(5, 12)],
-                ['name' => 'Sab', 'ventas' => rand(8, 15)],
-                ['name' => 'Dom', 'ventas' => rand(4, 9)]
-            ]
+            'activity_data' => $activity_data
         ]);
     }
 }

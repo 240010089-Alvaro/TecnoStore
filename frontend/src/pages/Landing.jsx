@@ -86,7 +86,7 @@ const PCard = ({ p, idx, user, onRequireAuth }) => {
           <img src={`http://localhost:8000/productos/${p.imagen}`} alt={p.nombre} loading="lazy" />
         ) : (
           <div className="ld-pcard-placeholder">
-            <IonIcon icon={flashOutline} />
+            <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '50px', height: '50px', opacity: 0.4 }} />
           </div>
         )}
         <div className="ld-pcard-img-overlay" />
@@ -188,17 +188,15 @@ const Landing = () => {
 
           {/* NAVBAR */}
           <nav className="ld-nav">
-            <div className="ld-nav-logo">
-              <div className="ld-nav-logo-mark">
-                <IonIcon icon={flashOutline} style={{ fontSize: '18px' }} />
-              </div>
+            <div className="ld-nav-logo" style={{ gap: '15px', height: '100%', display: 'flex', alignItems: 'center' }}>
+              <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
               TecnoStore
             </div>
             <div className="ld-nav-links">
               <button className="ld-nav-link" onClick={() => router.push("/productos")}>Catálogo</button>
               {user ? (
                 <button className="ld-nav-btn" onClick={goToDashboard}>
-                  Mi Tablero →
+                  {user.empresa ? "Mi Tablero →" : "Mi Cuenta →"}
                 </button>
               ) : (
                 <>
@@ -277,7 +275,7 @@ const Landing = () => {
                     </>
                   ) : (
                     <div className="ld-mockup-loading">
-                      <IonIcon icon={flashOutline} className="ld-loading-pulse" />
+                      <img src="/Logo-TecnoStore.png" alt="Loading" className="ld-loading-pulse" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
                     </div>
                   )}
                 </div>
@@ -392,7 +390,7 @@ const Landing = () => {
                 <div className="ld-modal-actions">
                   <button className="ld-modal-btn-primary" onClick={() => router.push('/login')}>
                     Ir al inicio de sesión
-                    <IonIcon icon={flashOutline} />
+                    <img src="/Logo-TecnoStore.png" alt="Logo" style={{ width: '24px', height: '24px', marginLeft: '10px' }} />
                   </button>
                   <button className="ld-modal-btn-ghost" onClick={() => setShowAuthModal(false)}>
                     Explorar un poco más

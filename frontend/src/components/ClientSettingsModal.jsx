@@ -99,6 +99,9 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
 
       const res = await fetch(`http://localhost:8000/api/perfil/cliente/${user.id}`, {
         method: 'POST',
+        headers: {
+          'Accept': 'application/json'
+        },
         body: form
       });
 
@@ -111,7 +114,11 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
         setFormData({ ...formData, password: "" });
         onDismiss();
       } else {
-        showToast(data.message || "Error al guardar los cambios", "error");
+        let errorMsg = data.message || "Error al guardar los cambios";
+        if (data.errors) {
+          errorMsg = Object.values(data.errors).flat().join("\n");
+        }
+        showToast(errorMsg, "error");
       }
     } catch (err) {
       console.error(err);

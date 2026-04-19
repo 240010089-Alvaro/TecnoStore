@@ -83,10 +83,8 @@ const PantallaInicio = () => {
 
           {/* NAVBAR */}
           <nav className="pi-nav">
-            <div className="pi-nav-logo" onClick={() => router.push("/PantallaInicio")}>
-              <div className="pi-nav-logomark">
-                <IonIcon icon={flashOutline} style={{ fontSize: '20px' }} />
-              </div>
+            <div className="pi-nav-logo" onClick={() => router.push("/PantallaInicio")} style={{ display:'flex', alignItems:'center', gap:'15px' }}>
+              <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
               <span className="pi-nav-brand">TecnoStore</span>
             </div>
 
@@ -135,7 +133,7 @@ const PantallaInicio = () => {
 
               <div className="pi-hero-btns">
                 <button className="pi-btn-primary" onClick={() => router.push("/productos")}>
-                  Explorar productos <IonIcon icon={flashOutline} style={{ marginLeft: '8px' }}/>
+                  Explorar productos <img src="/Logo-TecnoStore.png" alt="Logo" style={{ width: '28px', height: '28px', marginLeft: '10px' }}/>
                 </button>
                 <button className="pi-btn-ghost">
                   Ver ofertas
