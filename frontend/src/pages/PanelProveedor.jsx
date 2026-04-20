@@ -212,7 +212,9 @@ const PanelProveedor = () => {
     <IonPage>
       <IonContent fullscreen className="pp-ion-content">
         <div className="pp-wrap">
-          <div className="pp-dots" />
+          <div className="pp-hex" />
+          <div className="pp-noise" />
+          <div className="pp-scan" />
           <div className="pp-orb pp-orb-1" />
           <div className="pp-orb pp-orb-2" />
           <div className="pp-orb pp-orb-3" />

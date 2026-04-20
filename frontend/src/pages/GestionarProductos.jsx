@@ -142,7 +142,9 @@ const GestionarProductos = () => {
     <IonPage>
       <IonContent fullscreen className="gp-ion-content">
         <div className="gp-wrap">
-          <div className="gp-dots" />
+          <div className="gp-hex" />
+          <div className="pp-noise" />
+          <div className="gp-scan" />
           <div className="gp-orb gp-orb-1" />
           <div className="gp-orb gp-orb-2" />
 
