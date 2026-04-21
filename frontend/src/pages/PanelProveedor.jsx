@@ -198,7 +198,7 @@ const PanelProveedor = () => {
           <header className="pp-header">
             <div className="pp-header-inner">
               <div className="pp-header-logo" onClick={() => router.push('/')}>
-                <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+                <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '130px', height: '130px', objectFit: 'contain' }} />
                 <div>
                   <p className="pp-htitle">Panel de Proveedor</p>
                   <p className="pp-hsub">Administra tus productos fácilmente</p>

@@ -187,7 +187,7 @@ const Landing = () => {
           {/* NAVBAR */}
           <nav className="ld-nav">
             <div className="ld-nav-logo" style={{ gap: '15px', height: '100%', display: 'flex', alignItems: 'center' }}>
-              <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+              <img src="/Logo-TecnoStore.png" alt="TecnoStore Logo" style={{ width: '110px', height: '110px', objectFit: 'contain' }} />
               TecnoStore
             </div>
             <div className="ld-nav-links">
@@ -273,7 +273,7 @@ const Landing = () => {
                     </>
                   ) : (
                     <div className="ld-mockup-loading">
-                      <img src="/Logo-TecnoStore.png" alt="Loading" className="ld-loading-pulse" style={{ width: '100px', height: '100px', objectFit: 'contain' }} />
+                      <img src="/Logo-TecnoStore.png" alt="Loading" className="ld-loading-pulse" style={{ width: '130px', height: '130px', objectFit: 'contain' }} />
                     </div>
                   )}
                 </div>
@@ -388,7 +388,7 @@ const Landing = () => {
                 <div className="ld-modal-actions">
                   <button className="ld-modal-btn-primary" onClick={() => router.push('/login')}>
                     Ir al inicio de sesión
-                    <img src="/Logo-TecnoStore.png" alt="Logo" style={{ width: '24px', height: '24px', marginLeft: '10px' }} />
+                    <img src="/Logo-TecnoStore.png" alt="Logo" style={{ width: '32px', height: '32px', marginLeft: '10px' }} />
                   </button>
                   <button className="ld-modal-btn-ghost" onClick={() => setShowAuthModal(false)}>
                     Explorar un poco más
