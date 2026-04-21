@@ -142,7 +142,9 @@ const GestionarProductos = () => {
     <IonPage>
       <IonContent fullscreen className="gp-ion-content">
         <div className="gp-wrap">
-          <div className="gp-dots" />
+          <div className="gp-hex" />
+          <div className="pp-noise" />
+          <div className="gp-scan" />
           <div className="gp-orb gp-orb-1" />
           <div className="gp-orb gp-orb-2" />
 
@@ -363,27 +365,47 @@ const GestionarProductos = () => {
           )}
         </IonModal>
 
-        {/* MODAL CONFIRMAR ELIMINAR (ALERT) */}
-        <IonAlert
-          isOpen={!!eliminando}
-          onDidDismiss={() => setEliminando(null)}
-          header="¿Eliminar producto?"
-          message={`<strong>"${eliminando?.nombre}"</strong> será eliminado permanentemente de la base de datos. Esta acción no se puede deshacer.`}
-          buttons={[
-            {
-              text: 'Cancelar',
-              role: 'cancel'
-            },
-            {
-              text: eliminandoId ? 'Eliminando...' : 'Sí, eliminar',
-              role: 'destructive',
-              handler: () => {
-                confirmarEliminar();
-                return false; // Prevent auto-close if we want to show loading
-              }
-            }
-          ]}
-        />
+        {/* MODAL CONFIRMAR ELIMINAR (MODAL ANIMADO) */}
+        <IonModal 
+          isOpen={!!eliminando} 
+          onDidDismiss={() => setEliminando(null)} 
+          className="gp-delete-modal"
+        >
+          {eliminando && (
+            <div className="gp-del-modal-content">
+              <div className="gp-del-icon-wrapper">
+                <div className="gp-del-icon-bg">
+                  <IonIcon icon={trashOutline} className="gp-del-icon" />
+                </div>
+              </div>
+              <h2 className="gp-del-title">¿Eliminar producto?</h2>
+              <p className="gp-del-message">
+                <strong>"{eliminando?.nombre}"</strong> será eliminado permanentemente. Esta acción no se puede deshacer.
+              </p>
+              
+              <div className="gp-del-actions">
+                <button 
+                  className="gp-del-cancel" 
+                  onClick={() => setEliminando(null)}
+                  disabled={eliminandoId}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  className="gp-del-confirm" 
+                  onClick={confirmarEliminar}
+                  disabled={eliminandoId}
+                >
+                  {eliminandoId ? (
+                    <><IonSpinner name="dots" className="gp-del-spinner" /> Eliminando</>
+                  ) : (
+                    "Sí, eliminar"
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </IonModal>
 
         <IonToast
           isOpen={showToast}

@@ -77,6 +77,26 @@ class ProfileController extends Controller
                 if ($request->has('direccion')) {
                     $entity->direccion = trim($request->direccion);
                 }
+                if ($request->has('facebook')) {
+                    $entity->facebook = trim($request->facebook);
+                }
+                if ($request->has('instagram')) {
+                    $entity->instagram = trim($request->instagram);
+                }
+                if ($request->has('tiktok')) {
+                    $entity->tiktok = trim($request->tiktok);
+                }
+                if ($request->has('whatsapp')) {
+                    $entity->whatsapp = trim($request->whatsapp);
+                }
+            }
+
+            // Handle Avatar Deletion
+            if ($request->has('eliminar_avatar') && ($request->eliminar_avatar === 'true' || $request->eliminar_avatar === true)) {
+                if ($entity->avatar && file_exists(public_path('avatars/' . $entity->avatar))) {
+                    @unlink(public_path('avatars/' . $entity->avatar));
+                }
+                $entity->avatar = null;
             }
 
             // Handle Avatar Upload

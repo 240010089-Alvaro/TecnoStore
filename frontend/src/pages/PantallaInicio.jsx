@@ -15,7 +15,8 @@ import {
   listOutline, 
   logOutOutline,
   closeOutline,
-  addOutline
+  addOutline,
+  receiptOutline
 } from 'ionicons/icons';
 import { useCart } from '../context/CartContext';
 import CartModal from '../components/CartModal';
@@ -60,6 +61,7 @@ const PantallaInicio = () => {
   const catsSectionRef = useRef(null);
   const [hoverDeals, setHoverDeals] = useState(false);
   const [hoverProds, setHoverProds] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   // Autoplay Effect
   useEffect(() => {
@@ -108,6 +110,8 @@ const PantallaInicio = () => {
       .then(res => res.json())
       .then(data => {
         setAllProducts(data);
+        const cats = [...new Set(data.map(p => p.categoria))].filter(Boolean);
+        setCategories(cats.length > 0 ? cats : ["Computadoras", "Audio", "Visual", "Telefonos", "Gaming"]);
         setLoading(false);
       })
       .catch(err => {
@@ -207,9 +211,9 @@ const PantallaInicio = () => {
 
               <div className="pi-hero-stats">
                 {[
-                  { n: `${realStats.products}+`, l: "Productos" },
-                  { n: `${realStats.customers}+`, l: "Clientes" },
-                  { n: "4.9★", l: "Rating" }
+                  { n: `${realStats.products || 0}+`, l: "Productos" },
+                  { n: `${realStats.customers || 0}+`, l: "Clientes" },
+                  { n: `${realStats.avg_rating || "5.0"}★`, l: "Rating" }
                 ].map(({ n, l }) => (
                   <div key={l} className="pi-stat-item">
                     <div className="pi-stat-num">{n}</div>
@@ -259,7 +263,7 @@ const PantallaInicio = () => {
           {/* MARQUEE */}
           <div className="pi-marquee">
             <div className="pi-marquee-track">
-              {[...MARQUEE, ...MARQUEE].map((item, i) => (
+              {(categories.length > 0 ? [...categories, ...categories, ...categories, ...categories] : [...MARQUEE, ...MARQUEE]).map((item, i) => (
                 <div key={i} className="pi-marquee-item">
                   {item}<span className="pi-mq-dot" />
                 </div>
@@ -315,10 +319,10 @@ const PantallaInicio = () => {
                           <p className="pi-feat-name">{p.nombre}</p>
                           <div className="pi-feat-footer">
                             <div>
-                              <span className="pi-feat-price-old">
+                              <span className="pi-feat-price-old" style={{ color: '#ef4444' }}>
                                 {Number(p.precio).toLocaleString("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 })}
                               </span>
-                              <span className="pi-feat-price" style={{ color: '#ef4444' }}>
+                              <span className="pi-feat-price" style={{ color: '#10b981' }}>
                                 {Number(discountedPrice).toLocaleString("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 })}
                               </span>
                             </div>
@@ -416,6 +420,14 @@ const PantallaInicio = () => {
               >
                 <div className="ump-btn-icon"><IonIcon icon={personOutline} /></div>
                 <span>Mi perfil</span>
+              </button>
+              
+              <button 
+                className="ump-btn" 
+                onClick={() => { setPopoverState({ show: false }); router.push('/mis-pedidos'); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={receiptOutline} /></div>
+                <span>Mis pedidos</span>
               </button>
               
               <button 

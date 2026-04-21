@@ -25,7 +25,9 @@ import {
   bulbOutline,
   cashOutline,
   layersOutline,
-  imageOutline
+  imageOutline,
+  peopleOutline,
+  checkmarkCircleOutline
 } from 'ionicons/icons';
 import imageCompression from "browser-image-compression";
 import { 
@@ -34,6 +36,21 @@ import {
 } from 'recharts';
 import { TrendingUp, ShoppingBag, Layers, Activity } from 'lucide-react';
 import './PanelProveedor.css';
+
+const PRODUCT_CATEGORIES = [
+  "Laptops",
+  "Smartphones",
+  "Tablets",
+  "Audio",
+  "Wearables",
+  "Monitores",
+  "Gaming",
+  "Componentes",
+  "Almacenamiento",
+  "Periféricos",
+  "Cámaras",
+  "Otros"
+];
 
 const PanelProveedor = () => {
   const router = useIonRouter();
@@ -59,6 +76,7 @@ const PanelProveedor = () => {
     category_distribution: [],
     activity_data: []
   });
+  const [globalStats, setGlobalStats] = useState({ customers: 0, avg_rating: 0 });
   const [loadingStats, setLoadingStats] = useState(true);
   
   // Ionic Overlay States
@@ -88,6 +106,12 @@ const PanelProveedor = () => {
         console.error("Error fetching stats:", err);
         setLoadingStats(false);
       });
+
+    // Fetch Global Stats
+    fetch("http://localhost:8000/api/stats")
+      .then(res => res.json())
+      .then(data => setGlobalStats(data))
+      .catch(err => console.error("Error fetching global stats:", err));
   }, [router]);
 
   const handleChange = async (e) => {
@@ -189,7 +213,9 @@ const PanelProveedor = () => {
     <IonPage>
       <IonContent fullscreen className="pp-ion-content">
         <div className="pp-wrap">
-          <div className="pp-dots" />
+          <div className="pp-hex" />
+          <div className="pp-noise" />
+          <div className="pp-scan" />
           <div className="pp-orb pp-orb-1" />
           <div className="pp-orb pp-orb-2" />
           <div className="pp-orb pp-orb-3" />
@@ -245,7 +271,18 @@ const PanelProveedor = () => {
                     
                     <div className="pp-field">
                       <label className="pp-label">Categoría</label>
-                      <input type="text" name="categoria" placeholder="Categoría" value={producto.categoria} onChange={handleChange} className="pp-input" required/>
+                      <select 
+                        name="categoria" 
+                        value={producto.categoria} 
+                        onChange={handleChange} 
+                        className="pp-input pp-select" 
+                        required
+                      >
+                        <option value="" disabled>Seleccionar categoría...</option>
+                        {PRODUCT_CATEGORIES.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
                     </div>
 
                     <div className="pp-field">
@@ -443,6 +480,27 @@ const PanelProveedor = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Global Stats Card */}
+              <div className="pp-card pp-global-stats-card">
+                <div className="pp-cardhead">
+                  <div className="pp-cardicon"><IonIcon icon={peopleOutline} /></div>
+                  <div>
+                    <p className="pp-cardtitle">Nuestra Comunidad</p>
+                    <p className="pp-cardsub">Estado general de TecnoStore</p>
+                  </div>
+                </div>
+                <div className="pp-global-stats-content">
+                  <div className="pp-gstat">
+                    <span className="pp-gstat-val">+{globalStats.customers.toLocaleString()}</span>
+                    <span className="pp-gstat-lbl">Usuarios felices</span>
+                  </div>
+                  <div className="pp-gstat">
+                    <span className="pp-gstat-val">{globalStats.avg_rating || "5.0"}★</span>
+                    <span className="pp-gstat-lbl">Calificación promedio</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -548,11 +606,11 @@ const PanelProveedor = () => {
           <div className="pp-success-container">
             <div className="pp-success-icon-wrapper">
               <div className="pp-success-icon-bg">
-                <IonIcon icon={cubeOutline} className="pp-success-icon" />
+                <IonIcon icon={checkmarkCircleOutline} className="pp-success-icon" />
               </div>
             </div>
-            <h2 className="pp-success-title">¡Publicado!</h2>
-            <p className="pp-success-subtitle">El producto ya está en tu catálogo</p>
+            <h2 className="pp-success-title">¡Publicado con éxito!</h2>
+            <p className="pp-success-subtitle">Tu producto ha sido añadido a tu catálogo y ya está disponible.</p>
           </div>
         </IonModal>
       </IonContent>

@@ -74,8 +74,8 @@ const PCard = ({ p, idx, user, onRequireAuth }) => {
   });
 
   return (
-    <div 
-      className={`ld-pcard ${isVisible ? 'reveal' : ''}`} 
+    <div
+      className={`ld-pcard ${isVisible ? 'reveal' : ''}`}
       ref={ref}
       style={{ transitionDelay: `${idx * 0.1}s` }}
     >
@@ -101,18 +101,18 @@ const PCard = ({ p, idx, user, onRequireAuth }) => {
           <span className="ld-pcard-price">{price}</span>
           <button
             className="ld-pcard-add"
-            onClick={async (e) => { 
-                e.stopPropagation();
-                if (!user) {
-                  onRequireAuth();
-                  return;
-                }
-                const res = await addToCart(p);
-                if (res.success) {
-                  setAdded(true); 
-                  setTimeout(() => setAdded(false), 700); 
-                }
-              }}
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!user) {
+                onRequireAuth();
+                return;
+              }
+              const res = await addToCart(p);
+              if (res.success) {
+                setAdded(true);
+                setTimeout(() => setAdded(false), 700);
+              }
+            }}
           >
             <IonIcon icon={added ? checkmarkOutline : addOutline} style={{ fontSize: '18px' }} />
           </button>
@@ -255,11 +255,11 @@ const Landing = () => {
                 <div className="ld-mockup">
                   {realProducts.length > 0 ? (
                     <>
-                      <img 
-                        src={`http://localhost:8000/productos/${realProducts[heroImg].imagen}`} 
-                        alt={realProducts[heroImg].nombre} 
-                        key={heroImg} 
-                        className="ld-mockup-img" 
+                      <img
+                        src={`http://localhost:8000/productos/${realProducts[heroImg].imagen}`}
+                        alt={realProducts[heroImg].nombre}
+                        key={heroImg}
+                        className="ld-mockup-img"
                       />
                       <div className="ld-mockup-bar">
                         <div>
@@ -312,12 +312,12 @@ const Landing = () => {
                 ))
               ) : (
                 realProducts.map((p, idx) => (
-                  <PCard 
-                    key={p.id} 
-                    p={p} 
-                    idx={idx} 
-                    user={user} 
-                    onRequireAuth={handleRequireAuth} 
+                  <PCard
+                    key={p.id}
+                    p={p}
+                    idx={idx}
+                    user={user}
+                    onRequireAuth={handleRequireAuth}
                   />
                 ))
               )}
@@ -356,9 +356,9 @@ const Landing = () => {
             <p className="ld-footer-sub">Crea tu cuenta gratis y empieza a comprar o vender hoy mismo.</p>
             <div className="ld-footer-btns">
               <button className="ld-btn-main" onClick={() => router.push("/login")}>
-                Crear cuenta gratis →
+                Crear cuenta
               </button>
-              <button className="ld-btn-ghost" onClick={() => router.push("/login")}>
+              <button className="ld-btn-ghost" onClick={() => router.push("/login?role=proveedor")}>
                 Soy proveedor
               </button>
             </div>
@@ -373,18 +373,18 @@ const Landing = () => {
                 <button className="ld-modal-close-btn" onClick={() => setShowAuthModal(false)}>
                   <IonIcon icon={checkmarkOutline} style={{ transform: 'rotate(45deg)' }} />
                 </button>
-                
+
                 <div className="ld-modal-icon-wrap">
                   <div className="ld-modal-icon-ring" />
                   <IonIcon icon={shieldCheckmarkOutline} className="ld-modal-icon" />
                 </div>
-                
+
                 <h2 className="ld-modal-title">Acceso Requerido</h2>
                 <p className="ld-modal-text">
-                  Para llevar la mejor tecnología a tu casa, necesitamos saber quién eres. 
+                  Para llevar la mejor tecnología a tu casa, necesitamos saber quién eres.
                   Inicia sesión como <strong>cliente</strong> para comenzar tu compra.
                 </p>
-                
+
                 <div className="ld-modal-actions">
                   <button className="ld-modal-btn-primary" onClick={() => router.push('/login')}>
                     Ir al inicio de sesión

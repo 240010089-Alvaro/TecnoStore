@@ -4,7 +4,7 @@ import {
   addOutline, checkmarkOutline, closeOutline, imageOutline,
   cartOutline, flashOutline, callOutline, chatbubblesOutline,
   cubeOutline, pricetagOutline, storefrontOutline, shieldCheckmarkOutline,
-  sparklesOutline
+  sparklesOutline, logoFacebook, logoInstagram, logoTiktok, logoWhatsapp
 } from 'ionicons/icons';
 import { useCart } from '../context/CartContext';
 import './ProductoCard.css';
@@ -88,6 +88,32 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
           )}
 
           <div className="pc-img-gradient" />
+
+          {/* Social Media Overlay */}
+          {proveedor && (
+            <div className="pc-social-overlay" onClick={e => e.stopPropagation()}>
+              {proveedor.facebook && (
+                <a href={proveedor.facebook} target="_blank" rel="noopener noreferrer" className="pc-social-link fb">
+                  <IonIcon icon={logoFacebook} />
+                </a>
+              )}
+              {proveedor.instagram && (
+                <a href={`https://instagram.com/${proveedor.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="pc-social-link ig">
+                  <IonIcon icon={logoInstagram} />
+                </a>
+              )}
+              {proveedor.tiktok && (
+                <a href={`https://tiktok.com/${proveedor.tiktok.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="pc-social-link tk">
+                  <IonIcon icon={logoTiktok} />
+                </a>
+              )}
+              {proveedor.whatsapp && (
+                <a href={`https://wa.me/${proveedor.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="pc-social-link wa">
+                  <IonIcon icon={logoWhatsapp} />
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Cuerpo */}
@@ -99,8 +125,8 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
           <div className="pc-footer">
             <div className="pc-price-wrap">
               <p className="pc-price-label">Precio</p>
-              {hasDiscount && <span className="pc-old-price">{oldPrice}</span>}
-              <p className="pc-price" style={hasDiscount ? { color: '#ef4444' } : {}}>{formattedPrice}</p>
+              {hasDiscount && <span className="pc-old-price" style={{ color: '#ef4444' }}>{oldPrice}</span>}
+              <p className="pc-price" style={hasDiscount ? { color: '#10b981' } : {}}>{formattedPrice}</p>
             </div>
 
             <div className="pc-footer-actions">
@@ -120,9 +146,13 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
         <div className="pc-prov-strip">
           {proveedor ? (
             <>
-              <div className="pc-prov-avatar" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
-                {provIni}
-              </div>
+              {proveedor.avatar ? (
+                <img src={`http://localhost:8000/avatars/${proveedor.avatar}`} alt={proveedor.name} className="pc-prov-avatar-img" />
+              ) : (
+                <div className="pc-prov-avatar" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
+                  {provIni}
+                </div>
+              )}
               <div style={{ minWidth: 0 }}>
                 <p className="pc-prov-name">{proveedor.name}</p>
                 <p className="pc-prov-company">{proveedor.empresa}</p>
@@ -186,8 +216,8 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
               {/* Price */}
               <div className="pdm-price-row">
                 <span className="pdm-currency">MXN</span>
-                {hasDiscount && <span className="pdm-old-price">{oldPrice}</span>}
-                <span className="pdm-amount" style={{ color: hasDiscount ? '#ef4444' : c2 }}>
+                {hasDiscount && <span className="pdm-old-price" style={{ color: '#ef4444' }}>{oldPrice}</span>}
+                <span className="pdm-amount" style={{ color: hasDiscount ? '#10b981' : c2 }}>
                   {Number(discountedPrice).toLocaleString('es-MX', { minimumFractionDigits: 0 })}
                 </span>
               </div>
@@ -227,9 +257,13 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
                 <h3 className="pdm-section-title">Proveedor</h3>
                 <div className="pdm-prov-card">
                   <div className="pdm-prov-top">
-                    <div className="pdm-prov-avatar" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
-                      {provIni}
-                    </div>
+                    {proveedor && proveedor.avatar ? (
+                      <img src={`http://localhost:8000/avatars/${proveedor.avatar}`} alt={proveedor.name} className="pdm-prov-avatar-img" />
+                    ) : (
+                      <div className="pdm-prov-avatar" style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}>
+                        {provIni}
+                      </div>
+                    )}
                     <div className="pdm-prov-info">
                       <p className="pdm-prov-name">{proveedor ? proveedor.name : 'Cargando...'}</p>
                       <p className="pdm-prov-company">{proveedor ? proveedor.empresa : ''}</p>
@@ -244,6 +278,35 @@ const ProductoCard = ({ producto, index = 0, onRequireAuth }) => {
                       <div className="pdm-contact-chip">
                         <IonIcon icon={callOutline} style={{ color: c2 }} />
                         <span>{proveedor.telefono}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Modal Social Links - More Striking */}
+                  {proveedor && (proveedor.facebook || proveedor.instagram || proveedor.tiktok || proveedor.whatsapp) && (
+                    <div className="pdm-social-section">
+                      <p className="pdm-social-label">Conecta con el vendedor</p>
+                      <div className="pdm-prov-socials">
+                        {proveedor.facebook && (
+                          <a href={proveedor.facebook} target="_blank" rel="noopener noreferrer" className="pdm-social-btn fb" title="Facebook">
+                            <IonIcon icon={logoFacebook} />
+                          </a>
+                        )}
+                        {proveedor.instagram && (
+                          <a href={`https://instagram.com/${proveedor.instagram.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="pdm-social-btn ig" title="Instagram">
+                            <IonIcon icon={logoInstagram} />
+                          </a>
+                        )}
+                        {proveedor.tiktok && (
+                          <a href={`https://tiktok.com/${proveedor.tiktok.replace('@','')}`} target="_blank" rel="noopener noreferrer" className="pdm-social-btn tk" title="TikTok">
+                            <IonIcon icon={logoTiktok} />
+                          </a>
+                        )}
+                        {proveedor.whatsapp && (
+                          <a href={`https://wa.me/${proveedor.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="pdm-social-btn wa" title="WhatsApp">
+                            <IonIcon icon={logoWhatsapp} />
+                          </a>
+                        )}
                       </div>
                     </div>
                   )}

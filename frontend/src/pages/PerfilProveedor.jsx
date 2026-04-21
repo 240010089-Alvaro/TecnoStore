@@ -18,8 +18,18 @@ import {
   lockClosedOutline,
   notificationsOutline,
   colorPaletteOutline,
-  saveOutline
+  saveOutline,
+  logoFacebook,
+  logoInstagram,
+  logoTiktok,
+  logoWhatsapp,
+  trashOutline,
+  qrCodeOutline,
+  shareSocialOutline,
+  downloadOutline
 } from 'ionicons/icons';
+import { QRCodeCanvas } from 'qrcode.react';
+import imageCompression from 'browser-image-compression';
 import './PerfilProveedor.css';
 import { useCart } from '../context/CartContext';
 
@@ -30,7 +40,9 @@ const PerfilProveedor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'security' | 'settings'
+  const [removedAvatar, setRemovedAvatar] = useState(false);
   const fileInputRef = useRef(null);
+  const qrRef = useRef(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -40,7 +52,11 @@ const PerfilProveedor = () => {
     telefono: "",
     direccion: "",
     password: "",
-    avatar_file: null
+    avatar_file: null,
+    facebook: "",
+    instagram: "",
+    tiktok: "",
+    whatsapp: ""
   });
 
   // Settings State (for JSON field)
@@ -65,8 +81,13 @@ const PerfilProveedor = () => {
         telefono: data.telefono || "",
         direccion: data.direccion || "",
         password: "",
-        avatar_file: null
+        avatar_file: null,
+        facebook: data.facebook || "",
+        instagram: data.instagram || "",
+        tiktok: data.tiktok || "",
+        whatsapp: data.whatsapp || ""
       });
+      setRemovedAvatar(false);
 
       if (data.ajustes) {
         try {
@@ -94,13 +115,38 @@ const PerfilProveedor = () => {
     fileInputRef.current?.click();
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, avatar_file: file });
-      const currentPreview = URL.createObjectURL(file);
-      setPreviewImage(currentPreview);
+      if (file.size > 10 * 1024 * 1024) {
+        showToast("La imagen es demasiado grande. Máx 10MB.", "error");
+        return;
+      }
+      
+      try {
+        const options = { 
+          maxSizeMB: 2, 
+          maxWidthOrHeight: 1024,
+          useWebWorker: true 
+        };
+        const compressedBlob = await imageCompression(file, options);
+        const finalFile = new File([compressedBlob], file.name, { type: file.type });
+        
+        setFormData({ ...formData, avatar_file: finalFile });
+        setRemovedAvatar(false);
+        setPreviewImage(URL.createObjectURL(finalFile));
+      } catch (error) {
+        console.error("Error compressing image:", error);
+        showToast("Error al procesar la imagen.", "error");
+      }
     }
+  };
+
+  const handleRemoveAvatar = () => {
+    setFormData({ ...formData, avatar_file: null });
+    setPreviewImage(null);
+    setRemovedAvatar(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSave = async () => {
@@ -114,12 +160,18 @@ const PerfilProveedor = () => {
       form.append("empresa", formData.empresa);
       form.append("telefono", formData.telefono);
       form.append("direccion", formData.direccion);
+      form.append("facebook", formData.facebook);
+      form.append("instagram", formData.instagram);
+      form.append("tiktok", formData.tiktok);
+      form.append("whatsapp", formData.whatsapp);
       
       if (formData.password) {
         form.append("password", formData.password);
       }
       if (formData.avatar_file) {
         form.append("avatar", formData.avatar_file);
+      } else if (removedAvatar) {
+        form.append("eliminar_avatar", "true");
       }
       form.append("ajustes", JSON.stringify(ajustes));
 
@@ -144,6 +196,36 @@ const PerfilProveedor = () => {
       showToast("Error de conexión al guardar", "error");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDownloadQR = () => {
+    const canvas = qrRef.current?.querySelector('canvas');
+    if (canvas) {
+      const url = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `TecnoStore_QR_${formData.empresa || proveedor.name}.png`;
+      a.click();
+    }
+  };
+
+  const handleShareQR = async () => {
+    const canvas = qrRef.current?.querySelector('canvas');
+    if (canvas && navigator.share) {
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve));
+        const file = new File([blob], `QR_${formData.empresa || proveedor.name}.png`, { type: "image/png" });
+        await navigator.share({
+          title: `Perfil de ${formData.empresa || proveedor.name}`,
+          text: `Mira nuestra tienda en TecnoStore!`,
+          files: [file]
+        });
+      } catch (err) {
+        console.error("Error sharing QR", err);
+      }
+    } else {
+      showToast("La función de compartir no está disponible en este navegador.", "warning");
     }
   };
 
@@ -201,6 +283,13 @@ const PerfilProveedor = () => {
                 <div className="prov-tab-icon"><IonIcon icon={notificationsOutline} /></div>
                 Preferencias y Avisos
               </button>
+              <button 
+                className={`prov-tab ${activeTab === 'qr' ? 'active' : ''}`}
+                onClick={() => setActiveTab('qr')}
+              >
+                <div className="prov-tab-icon"><IonIcon icon={qrCodeOutline} /></div>
+                Código QR del Perfil
+              </button>
             </div>
 
             {/* Main Content Area */}
@@ -229,8 +318,15 @@ const PerfilProveedor = () => {
                       </div>
                       <div className="prov-avatar-info">
                         <h3>Logo / Foto de Perfil</h3>
-                        <p>Sube una imagen recomendada de al menos 400x400px en formato JPG o PNG.</p>
-                        <button className="prov-btn-outline" onClick={handleImageClick}>Cambiar foto</button>
+                        <p>Sube una imagen recomendada de al menos 400x400px en formato JPG o PNG (máx. 10MB).</p>
+                        <div className="prov-avatar-btns">
+                          <button className="prov-btn-outline" onClick={handleImageClick}>Cambiar foto</button>
+                          {(previewImage || proveedor.avatar) && !removedAvatar && (
+                            <button className="prov-btn-delete" onClick={handleRemoveAvatar} title="Eliminar foto">
+                              <IonIcon icon={trashOutline} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <input 
                         type="file" 
@@ -279,6 +375,41 @@ const PerfilProveedor = () => {
                         <div className="prov-input-wrapper">
                           <IonIcon icon={locationOutline} className="input-icon" />
                           <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} />
+                        </div>
+                      </div>
+
+                      <div className="prov-divider" style={{ gridColumn: '1/-1', height: '1px', background: 'rgba(255,255,255,0.05)', margin: '10px 0' }} />
+                      <h3 style={{ gridColumn: '1/-1', fontSize: '14px', fontWeight: '700', color: '#fff', marginBottom: '10px' }}>Redes Sociales</h3>
+
+                      <div className="prov-input-group">
+                        <label>Enlace Facebook</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={logoFacebook} className="input-icon" />
+                          <input type="text" name="facebook" placeholder="https://facebook.com/..." value={formData.facebook} onChange={handleChange} />
+                        </div>
+                      </div>
+
+                      <div className="prov-input-group">
+                        <label>Usuario Instagram</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={logoInstagram} className="input-icon" />
+                          <input type="text" name="instagram" placeholder="@usuario" value={formData.instagram} onChange={handleChange} />
+                        </div>
+                      </div>
+
+                      <div className="prov-input-group">
+                        <label>Usuario TikTok</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={logoTiktok} className="input-icon" />
+                          <input type="text" name="tiktok" placeholder="@usuario" value={formData.tiktok} onChange={handleChange} />
+                        </div>
+                      </div>
+
+                      <div className="prov-input-group">
+                        <label>WhatsApp (Número)</label>
+                        <div className="prov-input-wrapper">
+                          <IonIcon icon={logoWhatsapp} className="input-icon" />
+                          <input type="text" name="whatsapp" placeholder="Ej. 521234567890" value={formData.whatsapp} onChange={handleChange} />
                         </div>
                       </div>
                     </div>
@@ -376,6 +507,49 @@ const PerfilProveedor = () => {
                           />
                           <span className="prov-slider"></span>
                         </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 4: QR CODE */}
+              {activeTab === 'qr' && (
+                <div className="prov-card animate-fade-in">
+                  <div className="prov-card-header">
+                    <h2>Tu Código QR</h2>
+                    <p>Comparte tu tienda para que los clientes te encuentren fácilmente.</p>
+                  </div>
+                  
+                  <div className="prov-card-body">
+                    <div className="prov-qr-section" ref={qrRef}>
+                      <div className="prov-qr-container">
+                        <QRCodeCanvas 
+                          value={`${window.location.origin}/proveedor/tienda/${proveedor.id}`}
+                          size={256}
+                          level={"H"}
+                          includeMargin={true}
+                          imageSettings={{
+                            src: "/Logo-TecnoStore.png",
+                            x: undefined,
+                            y: undefined,
+                            height: 50,
+                            width: 50,
+                            excavate: true,
+                          }}
+                        />
+                      </div>
+                      <div className="prov-qr-info">
+                        <h3>{formData.empresa || proveedor.name}</h3>
+                        <p>Los clientes pueden escanear este código para ver todos tus productos en TecnoStore.</p>
+                        <div className="prov-qr-actions">
+                          <button className="prov-btn-qr" onClick={handleDownloadQR}>
+                            <IonIcon icon={downloadOutline} /> Descargar Imagen
+                          </button>
+                          <button className="prov-btn-qr prov-btn-share" onClick={handleShareQR}>
+                            <IonIcon icon={shareSocialOutline} /> Compartir Código
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

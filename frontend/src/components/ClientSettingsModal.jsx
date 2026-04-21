@@ -9,16 +9,24 @@ import {
   cameraOutline, 
   shieldCheckmarkOutline,
   colorPaletteOutline,
-  saveOutline
+  saveOutline,
+  qrCodeOutline,
+  shareSocialOutline,
+  downloadOutline
 } from 'ionicons/icons';
+import { QRCodeCanvas } from 'qrcode.react';
 import { useCart } from '../context/CartContext';
+import imageCompression from 'browser-image-compression';
+import { trashOutline } from 'ionicons/icons';
 import './ClientSettingsModal.css';
 
 const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
   const { showToast } = useCart();
   const [activeTab, setActiveTab] = useState('profile');
   const [saving, setSaving] = useState(false);
+  const [removedAvatar, setRemovedAvatar] = useState(false);
   const fileInputRef = useRef(null);
+  const qrRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -44,6 +52,7 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
         password: "",
         avatar_file: null
       });
+      setRemovedAvatar(false);
 
       if (user.ajustes) {
         try {
@@ -72,12 +81,38 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
     fileInputRef.current?.click();
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, avatar_file: file });
-      setPreviewImage(URL.createObjectURL(file));
+      if (file.size > 10 * 1024 * 1024) {
+        showToast("La imagen es demasiado grande. Máx 10MB.", "error");
+        return;
+      }
+      
+      try {
+        const options = { 
+          maxSizeMB: 2, 
+          maxWidthOrHeight: 1024,
+          useWebWorker: true 
+        };
+        const compressedBlob = await imageCompression(file, options);
+        const finalFile = new File([compressedBlob], file.name, { type: file.type });
+        
+        setFormData({ ...formData, avatar_file: finalFile });
+        setRemovedAvatar(false);
+        setPreviewImage(URL.createObjectURL(finalFile));
+      } catch (error) {
+        console.error("Error compressing image:", error);
+        showToast("Error al procesar la imagen.", "error");
+      }
     }
+  };
+
+  const handleRemoveAvatar = () => {
+    setFormData({ ...formData, avatar_file: null });
+    setPreviewImage(null);
+    setRemovedAvatar(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSave = async () => {
@@ -94,6 +129,8 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
       }
       if (formData.avatar_file) {
         form.append("avatar", formData.avatar_file);
+      } else if (removedAvatar) {
+        form.append("eliminar_avatar", "true");
       }
       form.append("ajustes", JSON.stringify(ajustes));
 
@@ -125,6 +162,36 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
       showToast("Error de conexión al guardar", "error");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDownloadQR = () => {
+    const canvas = qrRef.current?.querySelector('canvas');
+    if (canvas) {
+      const url = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `TecnoStore_QR_${user.name}.png`;
+      a.click();
+    }
+  };
+
+  const handleShareQR = async () => {
+    const canvas = qrRef.current?.querySelector('canvas');
+    if (canvas && navigator.share) {
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve));
+        const file = new File([blob], `QR_${user.name}.png`, { type: "image/png" });
+        await navigator.share({
+          title: 'Mí Perfil de TecnoStore',
+          text: `Escanea este código para ver mi perfil en TecnoStore: ${user.name}`,
+          files: [file]
+        });
+      } catch (err) {
+        console.error("Error sharing QR", err);
+      }
+    } else {
+      showToast("La función de compartir no está disponible en este navegador.", "warning");
     }
   };
 
@@ -173,6 +240,12 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
             >
               <IonIcon icon={notificationsOutline} /> Preferencias
             </button>
+            <button 
+              className={`cs-tab ${activeTab === 'qr' ? 'active' : ''}`}
+              onClick={() => setActiveTab('qr')}
+            >
+              <IonIcon icon={qrCodeOutline} /> Código QR
+            </button>
           </div>
 
           {/* Content */}
@@ -194,8 +267,15 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
                   </div>
                   <div className="cs-avatar-info">
                     <h3>Foto de Perfil</h3>
-                    <p>JPG o PNG, máx. 2MB</p>
-                    <button className="cs-btn-outline" onClick={handleImageClick}>Elegir foto</button>
+                    <p>JPG o PNG, máx. 10MB (se comprimirá)</p>
+                    <div className="cs-avatar-btns">
+                      <button className="cs-btn-outline" onClick={handleImageClick}>Elegir foto</button>
+                      {(previewImage || user.avatar) && !removedAvatar && (
+                        <button className="cs-btn-delete" onClick={handleRemoveAvatar} title="Eliminar foto">
+                          <IonIcon icon={trashOutline} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" style={{ display: 'none' }} />
                 </div>
@@ -292,6 +372,41 @@ const ClientSettingsModal = ({ isOpen, onDismiss, user, onUpdateUser }) => {
               </div>
             )}
 
+            {/* QR TAB */}
+            {activeTab === 'qr' && (
+              <div className="cs-tab-pane">
+                <div className="cs-qr-section" ref={qrRef}>
+                  <div className="cs-qr-container">
+                    <QRCodeCanvas 
+                      value={`${window.location.origin}/perfil/${user.id}`}
+                      size={200}
+                      level={"H"}
+                      includeMargin={true}
+                      imageSettings={{
+                        src: "/Logo-TecnoStore.png",
+                        x: undefined,
+                        y: undefined,
+                        height: 40,
+                        width: 40,
+                        excavate: true,
+                      }}
+                    />
+                  </div>
+                  <div className="cs-qr-info">
+                    <h3>Tu Código QR Personal</h3>
+                    <p>Comparte este código para que otros puedan encontrarte rápidamente en TecnoStore.</p>
+                    <div className="cs-qr-actions">
+                      <button className="cs-btn-qr" onClick={handleDownloadQR}>
+                        <IonIcon icon={downloadOutline} /> Descargar
+                      </button>
+                      <button className="cs-btn-qr cs-btn-share" onClick={handleShareQR}>
+                        <IonIcon icon={shareSocialOutline} /> Compartir
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

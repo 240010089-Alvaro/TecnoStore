@@ -5,27 +5,27 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Proveedor extends Model
+class Orden extends Model
 {
-
     use HasFactory;
 
-    protected $table = 'proveedores';
+    protected $table = 'ordenes';
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'empresa',
-        'telefono',
-        'direccion',
-        'facebook',
-        'instagram',
-        'tiktok',
-        'whatsapp'
+        'user_id',
+        'total',
+        'paypal_id',
+        'metodo_pago',
+        'status'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(OrdenDetalle::class, 'orden_id');
     }
 }
