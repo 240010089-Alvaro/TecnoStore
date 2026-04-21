@@ -11,6 +11,7 @@ import PanelProveedor from './pages/PanelProveedor';
 import PerfilProveedor from './pages/PerfilProveedor';
 import Productos from './pages/Productos';
 import GestionarProductos from './pages/GestionarProductos';
+import MisPedidos from './pages/MisPedidos';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 /* Components */
@@ -44,6 +45,7 @@ const App = () => {
               <Route exact path="/perfil-proveedor" component={PerfilProveedor} />
               <Route exact path="/productos" component={Productos} />
               <Route exact path="/gestionar-productos" component={GestionarProductos} />
+              <Route exact path="/mis-pedidos" component={MisPedidos} />
               <Redirect to="/" />
             </IonRouterOutlet>
             <CartModal />

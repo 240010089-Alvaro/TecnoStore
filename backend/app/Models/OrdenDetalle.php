@@ -25,6 +25,6 @@ class OrdenDetalle extends Model
 
     public function producto()
     {
-        return $this->belongsTo(Productos::class, 'producto_id');
+        return $this->belongsTo(Producto::class, 'producto_id');
     }
 }

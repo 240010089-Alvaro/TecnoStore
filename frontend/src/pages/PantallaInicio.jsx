@@ -15,7 +15,8 @@ import {
   listOutline, 
   logOutOutline,
   closeOutline,
-  addOutline
+  addOutline,
+  receiptOutline
 } from 'ionicons/icons';
 import { useCart } from '../context/CartContext';
 import CartModal from '../components/CartModal';
@@ -416,6 +417,14 @@ const PantallaInicio = () => {
               >
                 <div className="ump-btn-icon"><IonIcon icon={personOutline} /></div>
                 <span>Mi perfil</span>
+              </button>
+              
+              <button 
+                className="ump-btn" 
+                onClick={() => { setPopoverState({ show: false }); router.push('/mis-pedidos'); }}
+              >
+                <div className="ump-btn-icon"><IonIcon icon={receiptOutline} /></div>
+                <span>Mis pedidos</span>
               </button>
               
               <button 

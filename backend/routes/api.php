@@ -47,3 +47,4 @@ Route::post('/perfil/proveedor/{id}', [ProfileController::class, 'updateProveedo
 // Órdenes
 Route::post('/ordenes', [OrdenController::class, 'store']);
 Route::get('/ordenes/{id}', [OrdenController::class, 'show']);
+Route::get('/ordenes/usuario/{user_id}', [OrdenController::class, 'indexByUser']);

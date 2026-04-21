@@ -1,0 +1,246 @@
+.mp-content {
+  --background: #020617;
+  color: white;
+}
+
+.mp-wrap {
+  min-height: 100%;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mp-header-section {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 10;
+}
+
+.mp-heading {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+  color: white;
+}
+
+.mp-heading em {
+  font-style: normal;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.mp-subheading {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Back button */
+.mp-back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.mp-back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-2px);
+}
+
+.mp-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Loading */
+.mp-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #94a3b8;
+}
+
+/* Empty State */
+.mp-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  margin-top: 20px;
+}
+
+.mp-empty-icon {
+  font-size: 64px;
+  color: #3b82f6;
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.mp-empty h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.mp-empty p {
+  color: #64748b;
+  margin-bottom: 32px;
+}
+
+.mp-cta-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.mp-cta-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* List & Cards */
+.mp-list {
+  display: grid;
+  gap: 20px;
+  position: relative;
+  z-index: 10;
+}
+
+.mp-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mp-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.mp-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.mp-order-id {
+  display: flex;
+  flex-direction: column;
+}
+
+.mp-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.mp-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.mp-status-badge {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.mp-card-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mp-info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.mp-info-item ion-icon {
+  font-size: 18px;
+  color: #3b82f6;
+}
+
+.mp-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mp-view-txt {
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.mp-card:hover .mp-view-txt {
+  opacity: 1;
+}
+
+/* Reusing some styles from PantallaInicio */
+.pi-orb {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.pi-orb-1 { background: #3b82f6; }
+.pi-orb-2 { background: #8b5cf6; }
+
+@media (max-width: 600px) {
+  .mp-heading { font-size: 1.8rem; }
+  .mp-card { padding: 20px; }
+  .mp-card-body { grid-template-columns: 1fr; }
+}

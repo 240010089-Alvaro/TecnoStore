@@ -78,4 +78,17 @@ class OrdenController extends Controller
             'orden' => $orden
         ]);
     }
+
+    public function indexByUser($user_id)
+    {
+        $ordenes = Orden::with('detalles.producto')
+            ->where('user_id', $user_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'ordenes' => $ordenes
+        ]);
+    }
 }
